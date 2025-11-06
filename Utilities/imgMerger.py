@@ -1,11 +1,12 @@
 from PIL import Image
 import sys
+import os
 
-def generaImg(placaPath, vuelosPath, salidaPath):
+def generaImg(placaPath, vuelosPath, salidaDir):
     placa = Image.open(placaPath).convert("RGBA")
     vuelos = Image.open(vuelosPath).convert("RGBA")
  
-    vuelos = vuelos.resize((vuelos.width // 2,vuelos.height // 2)) #Reduce vuelos a la mitad de su tamaño
+    vuelos = vuelos.resize((vuelos.width // 1.2,vuelos.height // 1.2)) #Reduce vuelos a la mitad de su tamaño
 
     # Calcular centro
     posX = (placa.width - vuelos.width) // 2
@@ -17,8 +18,9 @@ def generaImg(placaPath, vuelosPath, salidaPath):
     resultado.paste(vuelos, (posX, posY), vuelos)  #Pega la imagen de vuelos encima de la placa, en el centro.
 
     # Guardar en formato compatible
+    salidaPath = os.path.join(salidaDir,"salida.png")
     resultado.save(salidaPath)
-    print(f"{salidaPath} creada.")
+    print(f"Salida creada en {salidaPath}.")
 
 if len(sys.argv) < 4:
     print("Uso: python imgMerger.py *placaPath* *vuelosPath* *salidaPath*")
@@ -26,6 +28,6 @@ if len(sys.argv) < 4:
 
 placaPath = sys.argv[1]
 vuelosPath = sys.argv[2]
-salidaPath = sys.argv[3]
+salidaDir = sys.argv[3]
 
-generaImg(placaPath, vuelosPath, salidaPath)
+generaImg(placaPath, vuelosPath, salidaDir)

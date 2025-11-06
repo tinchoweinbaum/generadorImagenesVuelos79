@@ -39,6 +39,8 @@ def paginaActiva(url,timeout = 15):
 def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 parámetros: url, nombre de la clase a capturar, y nombre del archivo a crear.
     selector = rf".{claseDiv}"
 
+    dirFoto = os.path.join(dir,"vuelosArribos.png")
+
     if(not paginaActiva(url)):
        print("La página no se encuentra activa, no existe, o tardó demasiado en responder.")
        exit()
@@ -53,8 +55,8 @@ def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 pa
         elemento = tab.query_selector(selector) #Selecciona el elemento
 
         if elemento: 
-            elemento.screenshot(path=archivo) #Si existe le saca screenshot, si no, tira error.
-            print(f"Se guardó el archivo como: {archivo}")
+            elemento.screenshot(path = dirFoto) #Si existe le saca screenshot, si no, tira error.
+            print(f"Se guardó el archivo en: {dirFoto}")
         else:
             print(f"No se encontró la clase {selector} dentro de la URL especificada. Probablemente se cambio la pagina de aeropuertosargentina.com")
 
@@ -65,6 +67,5 @@ def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 pa
 claseHtml = r"flex.flex-col.tablet\:w-\[41\.5rem\].tablet\:mx-auto.xl\:w-full.mt-6.xl\:mt-8" #actualmente esto se hardcodea hasta que se rompa XD
 
 dir, url = leeTxt()
-dirFoto = os.path.join(dir,"vuelosArribos.png")
 
-sacaScreen(url,claseHtml,dirFoto)
+sacaScreen(url,claseHtml,dir)
