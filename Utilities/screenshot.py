@@ -2,6 +2,7 @@ import os
 import requests
 from playwright.sync_api import sync_playwright
 
+#RECORTAR Y RESIZEAR CORRECTAMENTE EL SCREENSHOT, LLEVARLO A 1920x1080 Y HACER Q LAS COSAS Q SOBRAN EN EL SCREENSHOT QUEDEN AFUERA DEL MISMO
 
 
 def leeTxt():
