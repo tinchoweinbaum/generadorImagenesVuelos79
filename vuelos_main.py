@@ -6,7 +6,7 @@ import time
 def llamaScreenshot():
     subprocess.run(["python","Utilities/screenshot.py"])
 
-schedule.every().hour.at(":33").do(llamaScreenshot)
+schedule.every().hour.at(":10").do(llamaScreenshot)
 
 while True:
     schedule.run_pending()
