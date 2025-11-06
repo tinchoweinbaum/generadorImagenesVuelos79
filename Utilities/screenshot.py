@@ -40,7 +40,7 @@ def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 pa
     selector = rf".{claseDiv}"
 
     if(not paginaActiva(url)):
-       print("La página no se encuentra activa o tardó demasiado en responder.")
+       print("La página no se encuentra activa, no existe, o tardó demasiado en responder.")
        exit()
 
     with sync_playwright() as p:
