@@ -7,6 +7,7 @@ import os
 
 
 #FALTA HACER LOS CAMBIOS NECESARIOS PARA HACER LO MISMO CON LAS 2 PLACAS: PARTIDAS Y ARRIBOS
+#TENER EN CUENTA QUE ACTUALMENTE LE ESTA SACANDO FOTO A LAS PARTIDAS, NO A LOS ARRIBOS, MANEJAR ESO EN SCREENSHOT.PY
 
 def leeTxt():
 
@@ -47,7 +48,7 @@ dirPartidas = os.path.join("screenshots","vuelosPartidas.png") #dirección del s
 
 print("Esperando a la hora xx:10...")
 
-schedule.every().hour.at(":50").do(lambda: generaPlaca(dirArribos,url,dirPlacaArribos,dirArribos,dirSalida))
+schedule.every().hour.at(":10").do(lambda: generaPlaca(dirArribos,url,dirPlacaArribos,dirArribos,dirSalida))
 
 while True:
     schedule.run_pending()
