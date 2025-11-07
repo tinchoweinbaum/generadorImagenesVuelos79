@@ -1,6 +1,7 @@
 import os
 import requests
 from playwright.sync_api import sync_playwright
+from PIL import Image
 
 #RECORTAR Y RESIZEAR CORRECTAMENTE EL SCREENSHOT, LLEVARLO A 1920x1080 Y HACER Q LAS COSAS Q SOBRAN EN EL SCREENSHOT QUEDEN AFUERA DEL MISMO
 
@@ -26,9 +27,8 @@ def leeTxt():
             else:
                 return r"D:\Placas\MDQ", "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ"
     except FileNotFoundError:
-        print("No existe datosvuelos.txt")
+        print("No existe datosvuelos.txt")    
 
-    
 
 def paginaActiva(url,timeout = 15):
     try:
@@ -38,7 +38,7 @@ def paginaActiva(url,timeout = 15):
         return False
 
 def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 parámetros: url, nombre de la clase a capturar, y nombre del archivo a crear.
-    selector = rf".{claseDiv}"
+    #selector = rf".{claseDiv}"
 
     dirFoto = os.path.join(dir,"vuelosArribos.png")
 
@@ -53,20 +53,27 @@ def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 pa
         tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
         tab.wait_for_load_state("networkidle")
 
-        elemento = tab.query_selector(selector) #Selecciona el elemento
+        verMas = tab.query_selector(r".flex.flex-row.items-center.justify-center.lg\:gap-2.gap-1")
+
+        #Se clickea el botón de ver más antes de sacar la foto
+        if (verMas):
+            verMas.click()
+            #algo x la rama del else?
+
+        elemento = tab.query_selector(claseDiv) #Selecciona el elemento
 
         if elemento: 
             elemento.screenshot(path = dirFoto) #Si existe le saca screenshot, si no, tira error.
-            print(f"Se guardó el archivo en: {dirFoto}")
+            print(f"Se guardo el screenshot de aeropuertosargentina.com en: {dirFoto}")
         else:
-            print(f"No se encontró la clase {selector} dentro de la URL especificada. Probablemente se cambio la pagina de aeropuertosargentina.com")
+            print(f"No se encontro la clase {claseDiv} dentro de la URL especificada. Probablemente hubo cambios la pagina de aeropuertosargentina.com")
 
         navegador.close()
 
-
-
-claseHtml = r"flex.flex-col.tablet\:w-\[41\.5rem\].tablet\:mx-auto.xl\:w-full.mt-6.xl\:mt-8" #actualmente esto se hardcodea hasta que se rompa XD
+claseHtml = r".flex.flex-col.space-5.mb-6.xl\:mb-8.w-full" #actualmente esto se hardcodea hasta que se rompa XD
 
 dir, url = leeTxt()
 
-sacaScreen(url,claseHtml,dir)
+sacaScreen(url,claseHtml,dir) #Genera el screenshot de la pagina de vuelos
+
+pathScreenshot = os.path.join(dir,"vuelosArribos.png")
