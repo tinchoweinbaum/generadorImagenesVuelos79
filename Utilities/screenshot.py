@@ -94,5 +94,3 @@ if __name__ == "__main__":
         cropScreenshotRight(pathScreenshot)
     except FileNotFoundError:
         exit()
-
-

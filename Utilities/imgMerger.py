@@ -20,12 +20,15 @@ def generaImg(placaPath, vuelosPath, salidaDir):
     resultado.save(salidaPath)
     print(f"Salida creada en {salidaPath}.")
 
-if len(sys.argv) < 4:
-    print("Uso: python imgMerger.py *placaPath* *vuelosPath* *salidaPath*")
-    sys.exit(1)
 
-placaPath = sys.argv[1]
-vuelosPath = sys.argv[2]
-salidaDir = sys.argv[3]
 
-generaImg(placaPath, vuelosPath, salidaDir)
+if __name__ == "__main__":
+    if len(sys.argv) < 4:
+        print("Uso: python imgMerger.py *placaPath* *vuelosPath* *salidaPath*")
+        sys.exit(1)
+
+    placaPath = sys.argv[1]
+    vuelosPath = sys.argv[2]
+    salidaDir = sys.argv[3]
+
+    generaImg(placaPath, vuelosPath, salidaDir)
