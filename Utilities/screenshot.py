@@ -1,35 +1,8 @@
 import os
 import requests
+import sys
 from playwright.sync_api import sync_playwright
 from PIL import Image
-
-#RECORTAR Y RESIZEAR CORRECTAMENTE EL SCREENSHOT, LLEVARLO A 1920x1080 Y HACER Q LAS COSAS Q SOBRAN EN EL SCREENSHOT QUEDEN AFUERA DEL MISMO
-
-
-def leeTxt():
-
-    "Esta funcion se encarga de leer el .txt y ver que parámetro fue el que se específicó."
-    "si no se especifica alguno de los dos (o los 2), defaultea a lo que está escrito en el readme.txt."
-
-    try:
-        with open("datosvuelos.txt", "r", encoding="utf-8") as arch:
-            lineasArch = [linea.strip() for linea in arch.readlines()]
-
-            if len(lineasArch) == 2:
-                # [0] = dir ; [1] = url
-                return lineasArch[0], lineasArch[1]
-
-            elif len(lineasArch) == 1:
-                if lineasArch[0].lower() == 'h':  # ignora mayúsculas/minúsculas
-                    return r"D:\Placas\MDQ", lineasArch[0]
-                else:
-                    return lineasArch[0], "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ"
-
-            else:
-                return r"D:\Placas\MDQ", "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ"
-    except FileNotFoundError:
-        print("No existe datosvuelos.txt")    
-
 
 def paginaActiva(url,timeout = 15):
     try:
@@ -38,9 +11,9 @@ def paginaActiva(url,timeout = 15):
     except requests.RequestException:
         return False
 
-def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 parámetros: url, nombre de la clase a capturar, y nombre del archivo a crear.
+def sacaScreen(url, claseDiv):  #La función pide 3 parámetros: url, nombre de la clase a capturar, y nombre del archivo a crear.
 
-    dirFoto = os.path.join(dir,"vuelosArribos.png")
+    dirFoto = os.path.join("screenshots","vuelosArribos.png")
 
     if(not paginaActiva(url)):
        print("La pagina no se encuentra activa, no existe, o tardo demasiado en responder.")
@@ -64,17 +37,17 @@ def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 pa
             screenshot = Image.open(dirFoto)
             screenshot = screenshot.resize((int(screenshot.width * 1.5),int(screenshot.height*1.5)), Image.LANCZOS) #Lo agranda 150% para que quede mejor en la placa
             screenshot.save(dirFoto)
-            print(f"Se guardo el screenshot de aeropuertosargentina.com en: {dirFoto}")
+            print(f"Se guardo el screenshot de arribos de aeropuertosargentina.com en: {dirFoto}")
         else:
             print(f"No se encontro la clase {claseDiv} dentro de la URL especificada. Probablemente hubo cambios la pagina de aeropuertosargentina.com")
 
         navegador.close()
 
-def cropScreenshotRight(pathFoto,porcentaje = 0.14): #Cropea la foto desde la derecha, si no especifica cuanto, se corta el 10%
+def cropScreenshotRight(pathFoto,porcentaje = 0.14): #Cropea la foto desde la derecha, si no especifica cuanto, se corta el 14%
     screenshot = Image.open(pathFoto)
 
     width, height= screenshot.size
-    widthCrop = width*(1 - porcentaje) #Se calcula el nuevo ancho de la imagen
+    widthCrop = int(width*(1 - porcentaje)) #Se calcula el nuevo ancho de la imagen
     tuplaSize = (0,0,widthCrop,height)
 
     screenshot = screenshot.crop(tuplaSize)
@@ -84,13 +57,18 @@ def cropScreenshotRight(pathFoto,porcentaje = 0.14): #Cropea la foto desde la de
 if __name__ == "__main__":
 
     claseHtml = r".flex.flex-col.space-5.mb-6.xl\:mb-8.w-full" #Clase HTML del cuadro de vuelos
-    dir, url = leeTxt()
 
-    sacaScreen(url,claseHtml,dir) #Genera el screenshot de la pagina de vuelos.
+    if len(sys.argv) < 2:
+        print("Uso: python Utilities/screenshot.py *dirFoto* *url*")
+        sys.exit(1)
 
-    pathScreenshot = os.path.join(dir, "vuelosArribos.png")  # Guarda la dirección de la imagen en una variable.
+    url = sys.argv[1]
+
+    sacaScreen(url,claseHtml) #Genera el screenshot de la pagina de vuelos.
+
+    pathScreenshot = os.path.join("screenshots", "vuelosArribos.png")  # Guarda la dirección de la imagen en una variable.
 
     try:
         cropScreenshotRight(pathScreenshot)
     except FileNotFoundError:
-        exit()
+        sys.exit(1)
