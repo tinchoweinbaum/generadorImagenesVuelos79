@@ -10,6 +10,7 @@ def leeTxt():
 
     "Esta funcion se encarga de leer el .txt y ver que parámetro fue el que se específicó."
     "si no se especifica alguno de los dos (o los 2), defaultea a lo que está escrito en el readme.txt."
+
     try:
         with open("datosvuelos.txt", "r", encoding="utf-8") as arch:
             lineasArch = [linea.strip() for linea in arch.readlines()]
@@ -38,12 +39,11 @@ def paginaActiva(url,timeout = 15):
         return False
 
 def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 parámetros: url, nombre de la clase a capturar, y nombre del archivo a crear.
-    #selector = rf".{claseDiv}"
 
     dirFoto = os.path.join(dir,"vuelosArribos.png")
 
     if(not paginaActiva(url)):
-       print("La página no se encuentra activa, no existe, o tardó demasiado en responder.")
+       print("La pagina no se encuentra activa, no existe, o tardo demasiado en responder.")
        exit()
 
     with sync_playwright() as p:
@@ -53,12 +53,9 @@ def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 pa
         tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
         tab.wait_for_load_state("networkidle")
 
-        verMas = tab.query_selector(r".flex.flex-row.items-center.justify-center.lg\:gap-2.gap-1")
-
-        #Se clickea el botón de ver más antes de sacar la foto
-        if (verMas):
-            verMas.click()
-            #algo x la rama del else?
+        #verMas = tab.query_selector(r".flex.flex-row.items-center.justify-center.lg\:gap-2.gap-1")
+        #if (verMas):   #Se clickea el botón de ver más antes de sacar la foto
+        #    verMas.click()
 
         elemento = tab.query_selector(claseDiv) #Selecciona el elemento
 
@@ -70,10 +67,32 @@ def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 pa
 
         navegador.close()
 
-claseHtml = r".flex.flex-col.space-5.mb-6.xl\:mb-8.w-full" #actualmente esto se hardcodea hasta que se rompa XD
+def cropScreenshotRight(pathFoto,porcentaje = 0.14): #Cropea la foto desde la derecha, si no especifica cuanto, se corta el 10%
+    screenshot = Image.open(pathFoto)
 
-dir, url = leeTxt()
+    if not screenshot:
+        exit()
 
-sacaScreen(url,claseHtml,dir) #Genera el screenshot de la pagina de vuelos
+    width, height= screenshot.size
+    widthCrop = width*(1 - porcentaje) #Se calcula el nuevo ancho de la imagen
+    tuplaSize = (0,0,widthCrop,height)
 
-pathScreenshot = os.path.join(dir,"vuelosArribos.png")
+    screenshot = screenshot.crop(tuplaSize)
+    screenshot.save(pathFoto)
+    print("Se recorto la imagen.")
+
+if __name__ == "__main__":
+
+    claseHtml = r".flex.flex-col.space-5.mb-6.xl\:mb-8.w-full" #actualmente esto se hardcodea hasta que cambien la clase del cuadro
+    dir, url = leeTxt()
+
+    sacaScreen(url,claseHtml,dir) #Genera el screenshot de la pagina de vuelos.
+
+    pathScreenshot = os.path.join(dir, "vuelosArribos.png")  # Guarda la dirección de la imagen en una variable.
+
+    try:
+        cropScreenshotRight(pathScreenshot)
+    except FileNotFoundError:
+        exit()
+
+
