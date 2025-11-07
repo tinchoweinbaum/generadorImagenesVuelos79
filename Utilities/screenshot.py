@@ -61,6 +61,9 @@ def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 pa
 
         if elemento: 
             elemento.screenshot(path = dirFoto) #Si existe le saca screenshot, si no, tira error.
+            screenshot = Image.open(dirFoto)
+            screenshot = screenshot.resize((int(screenshot.width * 1.5),int(screenshot.height*1.5)), Image.LANCZOS) #Lo agranda 150% para que quede mejor en la placa
+            screenshot.save(dirFoto)
             print(f"Se guardo el screenshot de aeropuertosargentina.com en: {dirFoto}")
         else:
             print(f"No se encontro la clase {claseDiv} dentro de la URL especificada. Probablemente hubo cambios la pagina de aeropuertosargentina.com")
@@ -69,9 +72,6 @@ def sacaScreen(url, claseDiv, archivo="screenshot.png"):  #La función pide 3 pa
 
 def cropScreenshotRight(pathFoto,porcentaje = 0.14): #Cropea la foto desde la derecha, si no especifica cuanto, se corta el 10%
     screenshot = Image.open(pathFoto)
-
-    if not screenshot:
-        exit()
 
     width, height= screenshot.size
     widthCrop = width*(1 - porcentaje) #Se calcula el nuevo ancho de la imagen
@@ -83,7 +83,7 @@ def cropScreenshotRight(pathFoto,porcentaje = 0.14): #Cropea la foto desde la de
 
 if __name__ == "__main__":
 
-    claseHtml = r".flex.flex-col.space-5.mb-6.xl\:mb-8.w-full" #actualmente esto se hardcodea hasta que cambien la clase del cuadro
+    claseHtml = r".flex.flex-col.space-5.mb-6.xl\:mb-8.w-full" #Clase HTML del cuadro de vuelos
     dir, url = leeTxt()
 
     sacaScreen(url,claseHtml,dir) #Genera el screenshot de la pagina de vuelos.
