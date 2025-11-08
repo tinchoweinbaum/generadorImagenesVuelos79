@@ -1,5 +1,8 @@
 from PIL import Image
 import sys
+import os
+
+# Crear carpeta si no existe
 
 def generaImg(placaPath, vuelosPath, salidaDir):
     placa = Image.open(placaPath).convert("RGBA")
@@ -15,6 +18,7 @@ def generaImg(placaPath, vuelosPath, salidaDir):
     resultado.paste(vuelos, (posX, posY), vuelos)  #Pega la imagen de vuelos encima de la placa, en el centro.
 
     # Guardar en formato compatible
+    os.makedirs(os.path.dirname(salidaDir), exist_ok=True)
     resultado.save(salidaDir)
     print(f"Placa creada en {salidaDir}.")
 

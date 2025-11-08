@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 import sys
 from playwright.sync_api import sync_playwright
@@ -20,7 +21,7 @@ def sacaScreenPartidas(url, claseDiv):
        exit()
 
     with sync_playwright() as p:
-        navegador = p.chromium.launch(headless=True) #Abre una instancia de chromium en headless y abre una página en este navegador
+        navegador = p.chromium.launch(headless=False) #Abre una instancia de chromium en headless y abre una página en este navegador
         tab = navegador.new_page()
 
         tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
@@ -53,7 +54,7 @@ def sacaScreenArribos(url, claseDiv):
 
     with sync_playwright() as p:
 
-        navegador = p.chromium.launch(headless=True) #Abre una instancia de chromium en headless y abre una página en este navegador
+        navegador = p.chromium.launch(headless=False) #Abre una instancia de chromium en headless y abre una página en este navegador
         tab = navegador.new_page()
 
         tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
@@ -65,6 +66,8 @@ def sacaScreenArribos(url, claseDiv):
         elemArribos = tab.query_selector(f"{claseBoton}") #Hace click en arribos
         if elemArribos:
             elemArribos.click()
+        
+        time.sleep(1)
 
         elemento = tab.query_selector(claseDiv) #Selecciona el elemento
 
