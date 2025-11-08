@@ -33,12 +33,18 @@ def leeTxt():
     except FileNotFoundError:
         print("No existe datosvuelos.txt")   
 
-def generaPlaca(dir,url,dirPlacaArribos,dirVuelos,dirSalida):
-    subprocess.run(["python","Utilities/screenshot.py",f"{url}"])
-    subprocess.run(["python","Utilities/imgMerger.py",f"{dirPlacaArribos}",f"{dirArribos}",f"{dirSalida}"])
+def generaPlaca(dirSalida,url,dirPlacaArribos,dirPlacaPartidas,dirArribos,dirPartidas):
+    subprocess.run(["python","Utilities/screenshot.py",f"{url}"]) #Crea los dos screenshots
+
+    dirSalidaArribos = os.path.join(dirSalida,"vuelosArribos.png")
+    subprocess.run(["python","Utilities/imgMerger.py",f"{dirPlacaArribos}",f"{dirArribos}",f"{dirSalidaArribos}"]) #crea placaArribos
+
+    dirSalidaPartidas = os.path.join(dirSalida,"vuelosPartidas.png")
+    subprocess.run(["python","Utilities/imgMerger.py",f"{dirPlacaPartidas}",f"{dirPartidas}",f"{dirSalidaPartidas}"]) #crea placaPartidas
+
     print("Esperando a la hora xx:10...")
 
-dirSalida, url = leeTxt() #dir tiene la direccion de donde guardar la placa terminada.
+dirSalida, url = leeTxt() #dirSalida tiene la direccion de donde guardar la placa terminada.
 
 dirPlacaArribos = r"placas/placaArribos.png" #direccion de la placa de arribos para el imgMerger.
 dirPlacaPartidas = r"placas/placaPartidas.png" #direccion de la placa de partidas para el imgMerger.
@@ -48,7 +54,7 @@ dirPartidas = os.path.join("screenshots","vuelosPartidas.png") #dirección del s
 
 print("Esperando a la hora xx:10...")
 
-schedule.every().hour.at(":10").do(lambda: generaPlaca(dirArribos,url,dirPlacaArribos,dirArribos,dirSalida))
+schedule.every().hour.at(":10").do(lambda: generaPlaca(dirSalida,url,dirPlacaArribos,dirPlacaPartidas,dirArribos,dirPartidas))
 
 while True:
     schedule.run_pending()

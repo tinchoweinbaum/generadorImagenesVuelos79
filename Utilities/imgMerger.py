@@ -16,9 +16,8 @@ def generaImg(placaPath, vuelosPath, salidaDir):
     resultado.paste(vuelos, (posX, posY), vuelos)  #Pega la imagen de vuelos encima de la placa, en el centro.
 
     # Guardar en formato compatible
-    salidaPath = os.path.join(salidaDir,"salida.png")
-    resultado.save(salidaPath)
-    print(f"Salida creada en {salidaPath}.")
+    resultado.save(salidaDir)
+    print(f"Salida creada en {salidaDir}.")
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
