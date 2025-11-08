@@ -1,3 +1,1 @@
-@echo off
-python vuelos_main.py
-pause
+C:\Users\Operador\AppData\Local\Programs\Python\Python314\python.exe vuelos_main.py

@@ -24,14 +24,14 @@ def leeTxt():
 
             elif len(lineasArch) == 1:
                 if lineasArch[0].lower() == 'h':  # ignora mayúsculas/minúsculas
-                    return r"D:\Placas\MDQ", lineasArch[0]
+                    return r"C:\Placas\aire\HD", lineasArch[0]
                 else:
                     return lineasArch[0], "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ"
 
             else:
-                return r"D:\Placas\MDQ", "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ"
+                return r"C:\Placas\aire\HD", "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ"
     except FileNotFoundError:
-        return r"D:\Placas\MDQ", "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ" 
+        return r"C:\Placas\aire\HD", "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ" 
 
 def generaPlaca(dirSalida,url,dirPlacaArribos,dirPlacaPartidas,dirArribos,dirPartidas):
     print("Generando placas...")
