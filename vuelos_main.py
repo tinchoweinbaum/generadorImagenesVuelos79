@@ -49,8 +49,8 @@ dirSalida, url = leeTxt() #dirSalida tiene la direccion de donde guardar la plac
 dirPlacaArribos = r"placas/placaArribos.png" #direccion de la placa de arribos para el imgMerger.
 dirPlacaPartidas = r"placas/placaPartidas.png" #direccion de la placa de partidas para el imgMerger.
 
-dirArribos = os.path.join("screenshots","vuelosArribos.png") #dirección del screenshot de arribos.
-dirPartidas = os.path.join("screenshots","vuelosPartidas.png") #dirección del screenshot de partidas.
+dirArribos = os.path.join("screenshots","arribos.png") #dirección del screenshot de arribos.
+dirPartidas = os.path.join("screenshots","partidas.png") #dirección del screenshot de partidas.
 
 print("Esperando a la hora xx:10...")
 
