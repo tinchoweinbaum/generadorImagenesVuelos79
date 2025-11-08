@@ -37,7 +37,7 @@ def sacaScreenPartidas(url, claseDiv):
             screenshot = Image.open(dirFoto)
             screenshot = screenshot.resize((int(screenshot.width * 1.5),int(screenshot.height*1.5)), Image.LANCZOS) #Lo agranda 150% para que quede mejor en la placa
             screenshot.save(dirFoto)
-            print(f"Se guardo el screenshot de partidas de aeropuertosargentina.com en: {dirFoto}")
+            #print(f"Se guardo el screenshot de partidas de aeropuertosargentina.com en: {dirFoto}")
         else:
             print(f"No se encontro la clase {claseDiv} dentro de la URL especificada. Probablemente hubo cambios la pagina de aeropuertosargentina.com")
 
@@ -73,7 +73,7 @@ def sacaScreenArribos(url, claseDiv):
             screenshot = Image.open(dirFoto)
             screenshot = screenshot.resize((int(screenshot.width * 1.5),int(screenshot.height*1.5)), Image.LANCZOS) #Lo agranda 150% para que quede mejor en la placa
             screenshot.save(dirFoto)
-            print(f"Se guardo el screenshot de arribos de aeropuertosargentina.com en: {dirFoto}")
+            #print(f"Se guardo el screenshot de arribos de aeropuertosargentina.com en: {dirFoto}")
         else:
             print(f"No se encontro la clase {claseDiv} dentro de la URL especificada. Probablemente hubo cambios la pagina de aeropuertosargentina.com")
 

@@ -16,7 +16,7 @@ def generaImg(placaPath, vuelosPath, salidaDir):
 
     # Guardar en formato compatible
     resultado.save(salidaDir)
-    print(f"Salida creada en {salidaDir}.")
+    print(f"Placa creada en {salidaDir}.")
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:

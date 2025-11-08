@@ -34,27 +34,31 @@ def leeTxt():
         return r"D:\Placas\MDQ", "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ" 
 
 def generaPlaca(dirSalida,url,dirPlacaArribos,dirPlacaPartidas,dirArribos,dirPartidas):
+    print("Generando placas...")
     subprocess.run(["python","Utilities/screenshot.py",f"{url}"]) #Crea los dos screenshots
 
-    dirSalidaArribos = os.path.join(dirSalida,"vuelosArribos.png")
+    dirSalidaArribos = os.path.join(dirSalida,"arribos.png")
     subprocess.run(["python","Utilities/imgMerger.py",f"{dirPlacaArribos}",f"{dirArribos}",f"{dirSalidaArribos}"]) #crea placaArribos
 
-    dirSalidaPartidas = os.path.join(dirSalida,"vuelosPartidas.png")
+    dirSalidaPartidas = os.path.join(dirSalida,"partidas.png")
     subprocess.run(["python","Utilities/imgMerger.py",f"{dirPlacaPartidas}",f"{dirPartidas}",f"{dirSalidaPartidas}"]) #crea placaPartidas
 
-    print("Esperando a la hora xx:10...")
 
 dirSalida, url = leeTxt() #dirSalida tiene la direccion de donde guardar la placa terminada.
 
 dirPlacaArribos = r"placas/placaArribos.png" #direccion de la placa de arribos para el imgMerger.
 dirPlacaPartidas = r"placas/placaPartidas.png" #direccion de la placa de partidas para el imgMerger.
 
-dirArribos = os.path.join("screenshots","arribos.png") #dirección del screenshot de arribos.
-dirPartidas = os.path.join("screenshots","partidas.png") #dirección del screenshot de partidas.
+dirArribos = os.path.join("screenshots","vuelosArribos.png") #dirección del screenshot de arribos.
+dirPartidas = os.path.join("screenshots","vuelosPartidas.png") #dirección del screenshot de partidas.
+
+generaPlaca(dirSalida,url,dirPlacaArribos,dirPlacaPartidas,dirArribos,dirPartidas)
 
 print("Esperando a la hora xx:10...")
 
 schedule.every().hour.at(":10").do(lambda: generaPlaca(dirSalida,url,dirPlacaArribos,dirPlacaPartidas,dirArribos,dirPartidas))
+
+
 
 while True:
     schedule.run_pending()
