@@ -49,7 +49,7 @@ def sacaScreenArribos(url, claseDiv):
 
     if(not paginaActiva(url)):
        print("La pagina no se encuentra activa, no existe, o tardo demasiado en responder.")
-       exit()
+       sys.exit(1)
 
     with sync_playwright() as p:
 

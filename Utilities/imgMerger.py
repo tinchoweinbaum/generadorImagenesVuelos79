@@ -1,6 +1,5 @@
 from PIL import Image
 import sys
-import os
 
 def generaImg(placaPath, vuelosPath, salidaDir):
     placa = Image.open(placaPath).convert("RGBA")

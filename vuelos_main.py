@@ -31,7 +31,7 @@ def leeTxt():
             else:
                 return r"D:\Placas\MDQ", "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ"
     except FileNotFoundError:
-        print("No existe datosvuelos.txt")   
+        return r"D:\Placas\MDQ", "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ" 
 
 def generaPlaca(dirSalida,url,dirPlacaArribos,dirPlacaPartidas,dirArribos,dirPartidas):
     subprocess.run(["python","Utilities/screenshot.py",f"{url}"]) #Crea los dos screenshots
