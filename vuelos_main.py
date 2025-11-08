@@ -37,10 +37,10 @@ def generaPlaca(dirSalida,url,dirPlacaArribos,dirPlacaPartidas,dirArribos,dirPar
     print("Generando placas...")
     subprocess.run(["python","Utilities/screenshot.py",f"{url}"]) #Crea los dos screenshots
 
-    dirSalidaArribos = os.path.join(dirSalida,"arribos.png")
+    dirSalidaArribos = os.path.join(dirSalida,"arribos.bmp")
     subprocess.run(["python","Utilities/imgMerger.py",f"{dirPlacaArribos}",f"{dirArribos}",f"{dirSalidaArribos}"]) #crea placaArribos
 
-    dirSalidaPartidas = os.path.join(dirSalida,"partidas.png")
+    dirSalidaPartidas = os.path.join(dirSalida,"partidas.bmp")
     subprocess.run(["python","Utilities/imgMerger.py",f"{dirPlacaPartidas}",f"{dirPartidas}",f"{dirSalidaPartidas}"]) #crea placaPartidas
 
 
