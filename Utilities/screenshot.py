@@ -5,6 +5,8 @@ import sys
 from playwright.sync_api import sync_playwright
 from PIL import Image
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 def paginaActiva(url,timeout = 15):
     try:
         resp = requests.get(url,timeout = timeout)
@@ -14,14 +16,14 @@ def paginaActiva(url,timeout = 15):
 
 def sacaScreenPartidas(url, claseDiv):
 
-    dirFoto = os.path.join("screenshots","vuelosPartidas.png")
+    dirFoto = os.path.join(BASE_DIR, "..", "screenshots", "vuelosPartidas.png")
 
     if(not paginaActiva(url)):
        print("La pagina no se encuentra activa, no existe, o tardo demasiado en responder.")
        exit()
 
     with sync_playwright() as p:
-        navegador = p.chromium.launch(headless=False) #Abre una instancia de chromium en headless y abre una página en este navegador
+        navegador = p.chromium.launch(headless=True) #Abre una instancia de chromium en headless y abre una página en este navegador
         tab = navegador.new_page()
 
         tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
@@ -46,7 +48,7 @@ def sacaScreenPartidas(url, claseDiv):
 
 def sacaScreenArribos(url, claseDiv):
 
-    dirFoto = os.path.join("screenshots","vuelosArribos.png")
+    dirFoto = os.path.join(BASE_DIR, "..", "screenshots", "vuelosArribos.png")
 
     if(not paginaActiva(url)):
        print("La pagina no se encuentra activa, no existe, o tardo demasiado en responder.")
@@ -54,7 +56,7 @@ def sacaScreenArribos(url, claseDiv):
 
     with sync_playwright() as p:
 
-        navegador = p.chromium.launch(headless=False) #Abre una instancia de chromium en headless y abre una página en este navegador
+        navegador = p.chromium.launch(headless=True) #Abre una instancia de chromium en headless y abre una página en este navegador
         tab = navegador.new_page()
 
         tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
@@ -67,8 +69,8 @@ def sacaScreenArribos(url, claseDiv):
         if elemArribos:
             elemArribos.click()
         
-        tab.reload()
         tab.wait_for_load_state("networkidle")
+        time.sleep(1)
 
         elemento = tab.query_selector(claseDiv) #Selecciona el elemento
 

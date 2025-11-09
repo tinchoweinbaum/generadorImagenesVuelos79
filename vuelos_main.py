@@ -48,9 +48,11 @@ def generaPlaca(dirSalida, url):
     subprocess.run(["python", screenshot_py, url])
 
     dirSalidaArribos = os.path.join(dirSalida, "arribos.bmp")
+    print("HAGO ARRIBOS")
     subprocess.run(["python", imgMerger_py, dirPlacaArribos, dirArribos, dirSalidaArribos])
 
     dirSalidaPartidas = os.path.join(dirSalida, "partidas.bmp")
+    print("HAGO PARTIDAS")
     subprocess.run(["python", imgMerger_py, dirPlacaPartidas, dirPartidas, dirSalidaPartidas])
 
 
