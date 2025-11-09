@@ -4,6 +4,7 @@ import os
 
 # Crear carpeta si no existe
 
+
 def generaImg(placaPath, vuelosPath, salidaDir):
     placa = Image.open(placaPath).convert("RGBA")
     vuelos = Image.open(vuelosPath).convert("RGBA")

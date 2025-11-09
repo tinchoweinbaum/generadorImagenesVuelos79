@@ -14,6 +14,7 @@ def paginaActiva(url,timeout = 15):
     except requests.RequestException:
         return False
 
+
 def sacaScreenPartidas(url, claseDiv):
 
     dirFoto = os.path.join(BASE_DIR, "..", "screenshots", "vuelosPartidas.png")
