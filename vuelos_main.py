@@ -1,63 +1,65 @@
-#Este programa llama a los 10 minutos de cada hora al programa que saca el screenshto
 import subprocess
 import schedule
 import time
 import os
 
-
-#FALTA HACER LOS CAMBIOS NECESARIOS PARA HACER LO MISMO CON LAS 2 PLACAS: PARTIDAS Y ARRIBOS
-#TENER EN CUENTA QUE ACTUALMENTE LE ESTA SACANDO FOTO A LAS PARTIDAS, NO A LOS ARRIBOS, MANEJAR ESO EN SCREENSHOT.PY
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def leeTxt():
+    """
+    Lee el archivo datosvuelos.txt y obtiene la carpeta de salida y la URL.
+    Si no existe o está incompleto, usa valores por defecto.
+    """
+    default_dir = r"C:\Placas\aire\HD"
+    default_url = "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ"
 
-    "Esta funcion se encarga de leer el .txt y ver que parámetro fue el que se específicó."
-    "si no se especifica alguno de los dos (o los 2), defaultea a lo que está escrito en el readme.txt."
+    config_path = os.path.join(BASE_DIR, "datosvuelos.txt")
 
     try:
-        with open("datosvuelos.txt", "r", encoding="utf-8") as arch:
-            lineasArch = [linea.strip() for linea in arch.readlines()]
+        with open(config_path, "r", encoding="utf-8") as arch:
+            lineas = [linea.strip() for linea in arch.readlines()]
 
-            if len(lineasArch) == 2:
-                # [0] = dir ; [1] = url
-                return lineasArch[0], lineasArch[1]
-
-            elif len(lineasArch) == 1:
-                if lineasArch[0].lower() == 'h':  # ignora mayúsculas/minúsculas
-                    return r"C:\Placas\aire\HD", lineasArch[0]
-                else:
-                    return lineasArch[0], "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ"
-
+        if len(lineas) == 2:
+            return lineas[0], lineas[1]
+        elif len(lineas) == 1:
+            if lineas[0].lower() == 'h':
+                return default_dir, lineas[0]
             else:
-                return r"C:\Placas\aire\HD", "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ"
+                return lineas[0], default_url
+        else:
+            return default_dir, default_url
+
     except FileNotFoundError:
-        return r"C:\Placas\aire\HD", "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ" 
+        return default_dir, default_url
 
-def generaPlaca(dirSalida,url,dirPlacaArribos,dirPlacaPartidas,dirArribos,dirPartidas):
+
+def generaPlaca(dirSalida, url):
     print("Generando placas...")
-    subprocess.run(["python","Utilities/screenshot.py",f"{url}"]) #Crea los dos screenshots
 
-    dirSalidaArribos = os.path.join(dirSalida,"arribos.bmp")
-    subprocess.run(["python","Utilities/imgMerger.py",f"{dirPlacaArribos}",f"{dirArribos}",f"{dirSalidaArribos}"]) #crea placaArribos
+    screenshot_py = os.path.join(BASE_DIR, "Utilities", "screenshot.py")
+    imgMerger_py = os.path.join(BASE_DIR, "Utilities", "imgMerger.py")
 
-    dirSalidaPartidas = os.path.join(dirSalida,"partidas.bmp")
-    subprocess.run(["python","Utilities/imgMerger.py",f"{dirPlacaPartidas}",f"{dirPartidas}",f"{dirSalidaPartidas}"]) #crea placaPartidas
+    dirPlacaArribos = os.path.join(BASE_DIR, "placas", "placaArribos.png")
+    dirPlacaPartidas = os.path.join(BASE_DIR, "placas", "placaPartidas.png")
+
+    dirArribos = os.path.join(BASE_DIR, "screenshots", "vuelosArribos.png")
+    dirPartidas = os.path.join(BASE_DIR, "screenshots", "vuelosPartidas.png")
+
+    subprocess.run(["python", screenshot_py, url])
+
+    dirSalidaArribos = os.path.join(dirSalida, "arribos.bmp")
+    subprocess.run(["python", imgMerger_py, dirPlacaArribos, dirArribos, dirSalidaArribos])
+
+    dirSalidaPartidas = os.path.join(dirSalida, "partidas.bmp")
+    subprocess.run(["python", imgMerger_py, dirPlacaPartidas, dirPartidas, dirSalidaPartidas])
 
 
-dirSalida, url = leeTxt() #dirSalida tiene la direccion de donde guardar la placa terminada.
+dirSalida, url = leeTxt()
 
-dirPlacaArribos = r"placas/placaArribos.png" #direccion de la placa de arribos para el imgMerger.
-dirPlacaPartidas = r"placas/placaPartidas.png" #direccion de la placa de partidas para el imgMerger.
-
-dirArribos = os.path.join("screenshots","vuelosArribos.png") #dirección del screenshot de arribos.
-dirPartidas = os.path.join("screenshots","vuelosPartidas.png") #dirección del screenshot de partidas.
-
-generaPlaca(dirSalida,url,dirPlacaArribos,dirPlacaPartidas,dirArribos,dirPartidas)
+generaPlaca(dirSalida, url)
 
 print("Esperando a la hora xx:10...")
-
-schedule.every().hour.at(":10").do(lambda: generaPlaca(dirSalida,url,dirPlacaArribos,dirPlacaPartidas,dirArribos,dirPartidas))
-
-
+schedule.every().hour.at(":10").do(lambda: generaPlaca(dirSalida, url))
 
 while True:
     schedule.run_pending()

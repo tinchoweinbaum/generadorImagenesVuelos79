@@ -38,7 +38,7 @@ def sacaScreenPartidas(url, claseDiv):
             screenshot = Image.open(dirFoto)
             screenshot = screenshot.resize((int(screenshot.width * 1.5),int(screenshot.height*1.5)), Image.LANCZOS) #Lo agranda 150% para que quede mejor en la placa
             screenshot.save(dirFoto)
-            #print(f"Se guardo el screenshot de partidas de aeropuertosargentina.com en: {dirFoto}")
+            print(f"Se guardo el screenshot de partidas de aeropuertosargentina.com en: {dirFoto}")
         else:
             print(f"No se encontro la clase {claseDiv} dentro de la URL especificada. Probablemente hubo cambios la pagina de aeropuertosargentina.com")
 
@@ -67,7 +67,8 @@ def sacaScreenArribos(url, claseDiv):
         if elemArribos:
             elemArribos.click()
         
-        time.sleep(1)
+        tab.reload()
+        tab.wait_for_load_state("networkidle")
 
         elemento = tab.query_selector(claseDiv) #Selecciona el elemento
 
@@ -76,7 +77,7 @@ def sacaScreenArribos(url, claseDiv):
             screenshot = Image.open(dirFoto)
             screenshot = screenshot.resize((int(screenshot.width * 1.5),int(screenshot.height*1.5)), Image.LANCZOS) #Lo agranda 150% para que quede mejor en la placa
             screenshot.save(dirFoto)
-            #print(f"Se guardo el screenshot de arribos de aeropuertosargentina.com en: {dirFoto}")
+            print(f"Se guardo el screenshot de arribos de aeropuertosargentina.com en: {dirFoto}")
         else:
             print(f"No se encontro la clase {claseDiv} dentro de la URL especificada. Probablemente hubo cambios la pagina de aeropuertosargentina.com")
 
@@ -93,7 +94,7 @@ def cropScreenshotRight(pathFoto,porcentaje = 0.14): #Cropea la foto desde la de
     screenshot.save(pathFoto)
 
 if __name__ == "__main__":
-
+    
     claseHtml = r".flex.flex-col.space-5.mb-6.xl\:mb-8.w-full" #Clase HTML del cuadro de vuelos
 
     if len(sys.argv) < 2:
