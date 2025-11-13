@@ -109,16 +109,18 @@ if __name__ == "__main__":
     sacaScreenPartidas(url,claseHtml) #Genera el screenshot de las Partidas
     sacaScreenArribos(url,claseHtml) #General el screenshot de los Arribos
 
-    pathScreenshotPartidas = os.path.join("screenshots", "vuelosPartidas.png")  #Cropea las imágenes
+    pathScreenshotPartidas = os.path.join(BASE_DIR, "..", "screenshots", "vuelosPartidas.png")  #Cropea las imágenes
 
     try:
         cropScreenshotRight(pathScreenshotPartidas)
     except FileNotFoundError:
+        print("no cropie")
         sys.exit(1)
 
-    pathScreenshotArribos = os.path.join("screenshots", "vuelosArribos.png")
+    pathScreenshotArribos = os.path.join(BASE_DIR, "..", "screenshots", "vuelosArribos.png")
 
     try:
         cropScreenshotRight(pathScreenshotArribos)
     except FileNotFoundError:
+        print("no cropie 2")
         sys.exit(1)

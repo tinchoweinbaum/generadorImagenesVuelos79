@@ -23,7 +23,7 @@ def leeTxt():
         if len(lineas) == 2:
             return lineas[0], lineas[1]
         elif len(lineas) == 1:
-            if lineas[0].lower() == 'h':
+            if lineas[0].lower() == 'h': 
                 return default_dir, lineas[0]
             else:
                 return lineas[0], default_url
