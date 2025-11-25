@@ -12,7 +12,7 @@ def leeTxt():
     Si no existe o está incompleto, usa valores por defecto.
     """
     default_dir = r"C:\Placas\aire\HD"
-    default_url = "https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ"
+    default_url = "https://www.aeropuertobahiablanca.com/"
 
     config_path = os.path.join(BASE_DIR, "datosvuelos.txt")
 
@@ -35,6 +35,7 @@ def leeTxt():
 
 
 def generaPlaca(dirSalida, url):
+    print("")
     print("Generando placas...")
 
     screenshot_py = os.path.join(BASE_DIR, "Utilities", "screenshot.py")
@@ -46,13 +47,20 @@ def generaPlaca(dirSalida, url):
     dirArribos = os.path.join(BASE_DIR, "screenshots", "vuelosArribos.png")
     dirPartidas = os.path.join(BASE_DIR, "screenshots", "vuelosPartidas.png")
 
-    subprocess.run(["python", screenshot_py, url])
+    try:
+ 
+        subprocess.run(["python", screenshot_py, url],check = True) #guarda los screenshots en /screenshots. NO en Utilities/screenshots
+        
+        dirSalidaArribos = os.path.join(dirSalida, "arribos.bmp")
+        subprocess.run(["python", imgMerger_py, dirPlacaArribos, dirArribos, dirSalidaArribos], check=True)
 
-    dirSalidaArribos = os.path.join(dirSalida, "arribos.bmp")
-    subprocess.run(["python", imgMerger_py, dirPlacaArribos, dirArribos, dirSalidaArribos])
+        dirSalidaPartidas = os.path.join(dirSalida, "partidas.bmp")
+        subprocess.run(["python", imgMerger_py, dirPlacaPartidas, dirPartidas, dirSalidaPartidas], check=True)
 
-    dirSalidaPartidas = os.path.join(dirSalida, "partidas.bmp")
-    subprocess.run(["python", imgMerger_py, dirPlacaPartidas, dirPartidas, dirSalidaPartidas])
+    except subprocess.CalledProcessError:
+        print("No se pudieron generar las placas")
+        exit()
+        return
 
 
 dirSalida, url = leeTxt()

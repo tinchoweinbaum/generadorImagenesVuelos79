@@ -8,7 +8,7 @@ Se pueden modificar parámetros del programa como la url de la página y el dire
 
 Si no se especifica alguno de los dos datos, se toman por defecto los siguientes:
 
-D:\Placas\MDQ
+D:\placas\aire\HD
 https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ
 
 Estos valores también se asumen si no existe datosvuelos.txt
