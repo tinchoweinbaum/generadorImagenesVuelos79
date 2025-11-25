@@ -41,8 +41,8 @@ def generaPlaca(dirSalida, url):
     screenshot_py = os.path.join(BASE_DIR, "Utilities", "screenshot.py")
     imgMerger_py = os.path.join(BASE_DIR, "Utilities", "imgMerger.py")
 
-    dirPlacaArribos = os.path.join(BASE_DIR, "placas", "placaArribos.png")
-    dirPlacaPartidas = os.path.join(BASE_DIR, "placas", "placaPartidas.png")
+    dirPlacaArribos = os.path.join(BASE_DIR, "placas", "arribosBahia.png")
+    dirPlacaPartidas = os.path.join(BASE_DIR, "placas", "partidasBahia.png")
 
     dirArribos = os.path.join(BASE_DIR, "screenshots", "vuelosArribos.png")
     dirPartidas = os.path.join(BASE_DIR, "screenshots", "vuelosPartidas.png")
