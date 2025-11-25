@@ -59,7 +59,6 @@ def generaPlaca(dirSalida, url):
 
     except subprocess.CalledProcessError:
         print("No se pudieron generar las placas")
-        exit()
         return
 
 
