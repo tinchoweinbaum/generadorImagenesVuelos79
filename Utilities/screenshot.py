@@ -24,11 +24,18 @@ def sacaScreenPartidas(url, claseDiv):
        exit()
 
     with sync_playwright() as p:
-        navegador = p.chromium.launch(headless=True) #Abre una instancia de chromium en headless y abre una página en este navegador
+        navegador = p.chromium.launch(headless=False) #Abre una instancia de chromium en headless y abre una página en este navegador
         tab = navegador.new_page()
 
         tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
         tab.wait_for_load_state("networkidle")
+
+        claseCerrar = ".fill-none.stroke-white"
+       
+        elemCerrar = tab.query_selector(f"{claseCerrar}")
+        if claseCerrar:
+            elemCerrar.click()
+
 
         #verMas = tab.query_selector(r".flex.flex-row.items-center.justify-center.lg\:gap-2.gap-1")
         #if (verMas):   #Se clickea el botón de ver más antes de sacar la foto
@@ -57,11 +64,17 @@ def sacaScreenArribos(url, claseDiv):
 
     with sync_playwright() as p:
 
-        navegador = p.chromium.launch(headless=True) #Abre una instancia de chromium en headless y abre una página en este navegador
+        navegador = p.chromium.launch(headless=False) #Abre una instancia de chromium en headless y abre una página en este navegador
         tab = navegador.new_page()
 
         tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
         tab.wait_for_load_state("networkidle")
+
+        claseCerrar = ".fill-none.stroke-white"
+       
+        elemCerrar = tab.query_selector(f"{claseCerrar}")
+        if claseCerrar:
+            elemCerrar.click()
 
 
         claseBoton = ".group.inline-flex.items-center.border-b-2.py-2.xl\\:py-2.px-3.lg\\:px-4.font-open.text-sm.font-semibold.leading-4.space-3.cursor-pointer.border-transparent.text-gray-500"
@@ -69,6 +82,7 @@ def sacaScreenArribos(url, claseDiv):
         elemArribos = tab.query_selector(f"{claseBoton}") #Hace click en arribos
         if elemArribos:
             elemArribos.click()
+
         
         tab.wait_for_load_state("networkidle")
         time.sleep(1)
