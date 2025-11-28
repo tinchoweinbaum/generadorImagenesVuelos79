@@ -58,6 +58,7 @@ def generaPlaca(dirSalida, url):
         subprocess.run(["python", imgMerger_py, dirPlacaPartidas, dirPartidas, dirSalidaPartidas], check=True)
 
     except subprocess.CalledProcessError:
+        #hacer acá que se genera una placa de "sin vuelos" y que printee que se genero esa placa
         print("No se pudieron generar las placas")
         return
 

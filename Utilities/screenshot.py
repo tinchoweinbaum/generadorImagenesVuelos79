@@ -24,7 +24,7 @@ def sacaScreenPartidas(url, claseDiv):
        sys.exit(1)
 
     with sync_playwright() as p:
-        navegador = p.chromium.launch(headless=True) #Abre una instancia de chromium en headless y abre una página en este navegador
+        navegador = p.chromium.launch(headless=False) #Abre una instancia de chromium en headless y abre una página en este navegador
         tab = navegador.new_page()
 
         tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
@@ -34,15 +34,16 @@ def sacaScreenPartidas(url, claseDiv):
         #if (verMas):   #Se clickea el botón de ver más antes de sacar la foto
         #    verMas.click()
 
-        elemento = tab.query_selector(claseDiv) #Selecciona el elemento
+        elemento = tab.locator(claseDiv) #Selecciona el elemento
 
-        if elemento: 
+        if elemento.count() > 0: 
             elemento.screenshot(path = dirFoto) #Si existe le saca screenshot, si no, tira error.
             screenshot = Image.open(dirFoto)
             screenshot = screenshot.resize((int(screenshot.width * 1.5),int(screenshot.height*1.5)), Image.LANCZOS) #Lo agranda 150% para que quede mejor en la placa
             screenshot.save(dirFoto)
             print(f"Se guardo el screenshot de partidas de aeropuertosargentina.com en: {dirFoto}")
         else:
+            print("La clase es " + claseDiv)
             print(f"No hay vuelos")
             sys.exit(1)
 
@@ -91,7 +92,7 @@ def sacaScreenArribos(url, claseDiv):
 
 if __name__ == "__main__":
     
-    claseHtml = r".tt-row.estimated" #Clase del cuadro en bahiablanca
+    claseHtml = "tbody tr" #Clase del cuadro en bahiablanca
 
 
     if len(sys.argv) < 2:
