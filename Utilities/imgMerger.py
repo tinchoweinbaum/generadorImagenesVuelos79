@@ -9,6 +9,11 @@ def generaImg(placaPath, vuelosPath, salidaDir):
     placa = Image.open(placaPath).convert("RGBA")
     vuelos = Image.open(vuelosPath).convert("RGBA")
 
+    vuelos = vuelos.resize(
+        (vuelos.width * 3, vuelos.height * 3),
+        Image.LANCZOS
+    )
+
     # Calcular centro
     posX = (placa.width - vuelos.width) // 2
     posY = round((placa.height - placa.height * 0.71))
