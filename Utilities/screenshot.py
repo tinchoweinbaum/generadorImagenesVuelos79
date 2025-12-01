@@ -25,40 +25,60 @@ def sacaScreenshots(url, claseDiv):
         sys.exit(1)
 
     with sync_playwright() as p:
-        navegador = p.chromium.launch(headless=False)
+        navegador = p.chromium.launch(headless=True)
         tab = navegador.new_page()
 
         tab.goto(url, wait_until="load")
         tab.wait_for_load_state("networkidle")
 
-        # 1 — IFRAME como LOCATOR (NO FrameLocator)
+        #Entro al iframe
         iframe_element = tab.frame_locator("iframe[src*='avionio.com'][src*='departures']")
-        # 2 — Entrar al contenido del iframe
-        tabla = iframe_element.locator(".tt")
-        # 3 — Screenshot
-        tabla.screenshot(path=dirFotoPartidas)
+        #Entro a la tabla dentro del iframe
+        tabla = iframe_element.locator("tbody")
 
-        print(f"Screenshot de partidas guardado en: {dirFotoPartidas}")
+        primer_tr = tabla.locator("tr").first
+
+        tbody_box = tabla.bounding_box()
+        tr_box = primer_tr.bounding_box()
+
+            # defino la región recortada: debajo del primer <tr>
+        clip = {
+            "x": tbody_box["x"],
+            "y": tr_box["y"] + tr_box["height"],   # empieza después del primer tr
+            "width": tbody_box["width"],
+            "height": (tbody_box["y"] + tbody_box["height"]) - (tr_box["y"] + tr_box["height"])
+        }
+
+        # Screenshot de SOLO esa región exacta del iframe
+        tab.screenshot(path=dirFotoPartidas, clip=clip)
+        print("Screenshot guardado:", dirFotoPartidas)
         
+        #Hace lo mismo pero con el iframe de llegadas ahora
         iframe_element = tab.frame_locator("iframe[src*='avionio.com'][src*='arrivals']")
-        # 2 — Entrar al contenido del iframe
-        tabla = iframe_element.locator(".tt")
-        # 3 — Screenshot
-        tabla.screenshot(path=dirFotoArribos)
+
+        tabla = iframe_element.locator("tbody")
+
+        primer_tr = tabla.locator("tr").first
+
+        if(primer_tr.count() == 1):
+            print("hola")
+
+        tbody_box = tabla.bounding_box()
+        tr_box = primer_tr.bounding_box()
+
+            # defino la región recortada: debajo del primer <tr>
+        clip = {
+            "x": tbody_box["x"],
+            "y": tr_box["y"] + tr_box["height"],   # empieza después del primer tr
+            "width": tbody_box["width"],
+            "height": (tbody_box["y"] + tbody_box["height"]) - (tr_box["y"] + tr_box["height"])
+        }
+
+        # Screenshot de SOLO esa región exacta del iframe
+        tab.screenshot(path=dirFotoArribos, clip=clip)
+        print("Screenshot guardado:", dirFotoArribos)
 
         navegador.close()
-
-def cropScreenshotTop(dirFoto,porcentaje = 0.5):
-    fotoOg = Image.open(dirFoto)
-
-    width, height = fotoOg.size
-    corte = int(height * porcentaje)
-
-    # Recorta desde 'corte' hasta el final
-    fotoCrop = fotoOg.crop((0, corte, width, height))
-
-    fotoCrop.save(dirFoto)
-
 
 if __name__ == "__main__":
     
@@ -72,5 +92,5 @@ if __name__ == "__main__":
     url = sys.argv[1]
 
     sacaScreenshots(url,claseHtml) #Genera los screenshots
-    cropScreenshotTop(r"d:\repos\generadorImagenesVuelos79\Utilities\..\screenshots\vuelosPartidas.png")
-    cropScreenshotTop(r"d:\repos\generadorImagenesVuelos79\Utilities\..\screenshots\vuelosArribos.png")
+    #cropScreenshotTop(r"d:\repos\generadorImagenesVuelos79\Utilities\..\screenshots\vuelosPartidas.png")
+    #cropScreenshotTop(r"d:\repos\generadorImagenesVuelos79\Utilities\..\screenshots\vuelosArribos.png",0.4)
