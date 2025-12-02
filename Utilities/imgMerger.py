@@ -1,13 +1,38 @@
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import sys
 import os
 
+def verificar_archivo(path):
+    """Verifica que un archivo exista y sea accesible."""
+    if not os.path.isfile(path):
+        print(f"\nERROR: No se encontró la imagen {path}")
+        return False
+
+    try:
+        Image.open(path).verify()  # verificar que sea una imagen válida
+    except UnidentifiedImageError:
+        print(f"\nERROR: El archivo no es una imagen válida")
+        return False
+    except Exception as e:
+        print(f"\nERROR: No se pudo leer {path}\n{e}")
+        return False
+    
+    return True #Si llega al final de la funcion es que exsite
+
 def generaImg(placaPath, vuelosPath, salidaDir):
+
+    #Verifica primero que existan la placa y el screenshot
+    if(not verificar_archivo(placaPath)):
+        sys.exit(1)
+
+    if(not verificar_archivo(vuelosPath)):
+        sys.exit(1)
+    
     placa = Image.open(placaPath).convert("RGBA")
     vuelos = Image.open(vuelosPath).convert("RGBA")
 
     vuelos = vuelos.resize(
-        (vuelos.width * 2, vuelos.height * 2),
+        (vuelos.width * 3, vuelos.height * 3),
         Image.LANCZOS
     )
 

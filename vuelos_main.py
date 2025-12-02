@@ -36,38 +36,45 @@ def leeTxt():
 
 def generaPlaca(dirSalida, url):
     print("")
-    print("Generando placas...")
+    print("Hora actual: " + time.strftime("%H:%M:%S"))
+    print("Generando placas...\n")
 
     screenshot_py = os.path.join(BASE_DIR, "Utilities", "screenshot.py")
     imgMerger_py = os.path.join(BASE_DIR, "Utilities", "imgMerger.py")
 
-    dirPlacaArribos = os.path.join(BASE_DIR, "placas", "arribosBahia.png")
-    dirPlacaPartidas = os.path.join(BASE_DIR, "placas", "partidasBahia.png")
+    dirPlacaArribos = os.path.join(BASE_DIR, "placas", "arribosBahia.bmp")
+    dirPlacaPartidas = os.path.join(BASE_DIR, "placas", "partidasBahia.bmp")
 
     dirArribos = os.path.join(BASE_DIR, "screenshots", "vuelosArribos.png")
     dirPartidas = os.path.join(BASE_DIR, "screenshots", "vuelosPartidas.png")
 
-    try:
- 
-        subprocess.run(["python", screenshot_py, url],check = True) #guarda los screenshots en /screenshots. NO en Utilities/screenshots
-        
-        dirSalidaArribos = os.path.join(dirSalida, "arribos.bmp")
-        subprocess.run(["python", imgMerger_py, dirPlacaArribos, dirArribos, dirSalidaArribos], check=True)
+    dirSalidaArribos = os.path.join(dirSalida, "arribos.bmp")
+    dirSalidaPartidas = os.path.join(dirSalida, "partidas.bmp")
 
-        dirSalidaPartidas = os.path.join(dirSalida, "partidas.bmp")
-        subprocess.run(["python", imgMerger_py, dirPlacaPartidas, dirPartidas, dirSalidaPartidas], check=True)
+    try:
+        subprocess.run(["python", screenshot_py, url], check=True)
+
+        try:
+            subprocess.run(["python", imgMerger_py, dirPlacaArribos, dirArribos, dirSalidaArribos],
+                           check=True)
+        except subprocess.CalledProcessError:
+            print("No se pudo generar la placa de arribos.\n")
+
+        try:
+            subprocess.run(["python", imgMerger_py, dirPlacaPartidas, dirPartidas, dirSalidaPartidas],
+                           check=True)
+        except subprocess.CalledProcessError:
+            print("No se pudo generar la placa de partidas.\n")
 
     except subprocess.CalledProcessError:
-        #hacer acá que se genera una placa de "sin vuelos" y que printee que se genero esa placa
         print("No se pudieron generar las placas")
         return
-
 
 dirSalida, url = leeTxt()
 
 generaPlaca(dirSalida, url)
 
-print("Esperando a la hora xx:10...")
+print("\nEsperando a la hora xx:10...")
 schedule.every().hour.at(":10").do(lambda: generaPlaca(dirSalida, url))
 
 while True:

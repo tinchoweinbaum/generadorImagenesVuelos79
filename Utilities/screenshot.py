@@ -20,7 +20,7 @@ def sacaScreenshots(url, claseDiv):
 
     dirFotoArribos = os.path.join(BASE_DIR, "..", "screenshots", "vuelosArribos.png")
 
-    if not paginaActiva(url):
+    if not paginaActiva:
         print("La pagina no se encuentra activa.")
         sys.exit(1)
 
@@ -51,32 +51,29 @@ def sacaScreenshots(url, claseDiv):
 
         # Screenshot de SOLO esa región exacta del iframe
         tab.screenshot(path=dirFotoPartidas, clip=clip)
-        print("Screenshot guardado:", dirFotoPartidas)
+        #print("Screenshot guardado:", dirFotoPartidas)
         
         #Hace lo mismo pero con el iframe de llegadas ahora
         iframe_element = tab.frame_locator("iframe[src*='avionio.com'][src*='arrivals']")
 
         tabla = iframe_element.locator("tbody")
 
-        primer_tr = tabla.locator("tr").first
+        primer_tr = tabla.locator("tr").first #Toma el primer tr (boton de vuelos anteriores)
 
-        if(primer_tr.count() == 1):
-            print("hola")
-
-        tbody_box = tabla.bounding_box()
+        tbody_box = tabla.bounding_box() #Se queda con las coordenadas en la pagina de la tabla y el primer tr
         tr_box = primer_tr.bounding_box()
 
-            # defino la región recortada: debajo del primer <tr>
+        # defino la región recortada: debajo del primer <tr>
         clip = {
             "x": tbody_box["x"],
-            "y": tr_box["y"] + tr_box["height"],   # empieza después del primer tr
+            "y": tr_box["y"] + tr_box["height"],   #toma la parte de la tabla que va despues del primer tr
             "width": tbody_box["width"],
-            "height": (tbody_box["y"] + tbody_box["height"]) - (tr_box["y"] + tr_box["height"])
+            "height": (tbody_box["y"] + tbody_box["height"]) - (tr_box["y"] + tr_box["height"]) #Cropea la parte que no necesita
         }
 
         # Screenshot de SOLO esa región exacta del iframe
         tab.screenshot(path=dirFotoArribos, clip=clip)
-        print("Screenshot guardado:", dirFotoArribos)
+        #print("Screenshot guardado:", dirFotoArribos)
 
         navegador.close()
 
@@ -92,5 +89,3 @@ if __name__ == "__main__":
     url = sys.argv[1]
 
     sacaScreenshots(url,claseHtml) #Genera los screenshots
-    #cropScreenshotTop(r"d:\repos\generadorImagenesVuelos79\Utilities\..\screenshots\vuelosPartidas.png")
-    #cropScreenshotTop(r"d:\repos\generadorImagenesVuelos79\Utilities\..\screenshots\vuelosArribos.png",0.4)
