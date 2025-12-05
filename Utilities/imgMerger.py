@@ -2,19 +2,24 @@ from PIL import Image
 import sys
 import os
 
-def existeImagen(path):
-    try:
-        with Image.open(path) as img:
-            img.verify()   # Verifica que no esté corrupta
-        return True
-    except Exception:
+def verificar_archivo(path):
+    """Verifica que un archivo exista y sea accesible."""
+    if not os.path.isfile(path):
+        print(f"\nERROR: No se encontró la imagen {path}")
         return False
 
+    try:
+        Image.open(path).verify()  # verificar que sea una imagen válida
+    except Image.UnidentifiedImageError:
+        print(f"\nERROR: El archivo no es una imagen válida")
+        return False
+    except Exception as e:
+        print(f"\nERROR: No se pudo leer {path}\n{e}")
+        return False
+    
+    return True #Si llega al final de la funcion es que exsite
+
 def generaImg(placaPath, vuelosPath, salidaDir):
-
-    if(not existeImagen(placaPath)):
-        print("No se encontró la placa de")
-
 
     placa = Image.open(placaPath).convert("RGBA")
     vuelos = Image.open(vuelosPath).convert("RGBA")
