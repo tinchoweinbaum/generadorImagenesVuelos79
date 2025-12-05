@@ -21,7 +21,13 @@ def verificar_archivo(path):
 
 def generaImg(placaPath, vuelosPath, salidaDir):
 
-    placa = Image.open(placaPath).convert("RGBA")
+    if(not verificar_archivo(placaPath)):
+        sys.exit(1)
+
+    if(not verificar_archivo(vuelosPath)):
+        sys.exit(1)
+
+    placa = Image.open(placaPath).convert("RGBA")  
     vuelos = Image.open(vuelosPath).convert("RGBA")
 
     # Calcular centro

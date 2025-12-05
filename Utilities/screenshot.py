@@ -36,11 +36,6 @@ def sacaScreenPartidas(url, claseDiv):
         if claseCerrar:
             elemCerrar.click()
 
-
-        #verMas = tab.query_selector(r".flex.flex-row.items-center.justify-center.lg\:gap-2.gap-1")
-        #if (verMas):   #Se clickea el botón de ver más antes de sacar la foto
-        #    verMas.click()
-
         elemento = tab.query_selector(claseDiv) #Selecciona el elemento
 
         if elemento: 

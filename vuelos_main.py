@@ -42,8 +42,8 @@ def generaPlaca(dirSalida, url):
     screenshot_py = os.path.join(BASE_DIR, "Utilities", "screenshot.py")
     imgMerger_py = os.path.join(BASE_DIR, "Utilities", "imgMerger.py")
 
-    dirPlacaArribos = os.path.join(BASE_DIR, "placas", "arribosBahia.bmp")
-    dirPlacaPartidas = os.path.join(BASE_DIR, "placas", "partidasBahia.bmp")
+    dirPlacaArribos = os.path.join(BASE_DIR, "placas", "placaArribos.png")
+    dirPlacaPartidas = os.path.join(BASE_DIR, "placas", "placaPartidas.png")
 
     dirArribos = os.path.join(BASE_DIR, "screenshots", "vuelosArribos.png")
     dirPartidas = os.path.join(BASE_DIR, "screenshots", "vuelosPartidas.png")
@@ -55,14 +55,12 @@ def generaPlaca(dirSalida, url):
         subprocess.run(["python", screenshot_py, url], check=True)
 
         try:
-            subprocess.run(["python", imgMerger_py, dirPlacaArribos, dirArribos, dirSalidaArribos],
-                           check=True)
+            subprocess.run(["python", imgMerger_py, dirPlacaArribos, dirArribos, dirSalidaArribos], check=True)
         except subprocess.CalledProcessError:
             print("No se pudo generar la placa de arribos.\n")
 
         try:
-            subprocess.run(["python", imgMerger_py, dirPlacaPartidas, dirPartidas, dirSalidaPartidas],
-                           check=True)
+            subprocess.run(["python", imgMerger_py, dirPlacaPartidas, dirPartidas, dirSalidaPartidas], check=True)
         except subprocess.CalledProcessError:
             print("No se pudo generar la placa de partidas.\n")
 
