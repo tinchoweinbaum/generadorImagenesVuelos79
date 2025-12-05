@@ -2,10 +2,20 @@ from PIL import Image
 import sys
 import os
 
-# Crear carpeta si no existe
-
+def existeImagen(path):
+    try:
+        with Image.open(path) as img:
+            img.verify()   # Verifica que no esté corrupta
+        return True
+    except Exception:
+        return False
 
 def generaImg(placaPath, vuelosPath, salidaDir):
+
+    if(not existeImagen(placaPath)):
+        print("No se encontró la placa de")
+
+
     placa = Image.open(placaPath).convert("RGBA")
     vuelos = Image.open(vuelosPath).convert("RGBA")
 

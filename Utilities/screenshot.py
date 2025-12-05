@@ -24,7 +24,7 @@ def sacaScreenPartidas(url, claseDiv):
        exit()
 
     with sync_playwright() as p:
-        navegador = p.chromium.launch(headless=False) #Abre una instancia de chromium en headless y abre una página en este navegador
+        navegador = p.chromium.launch(headless=True) #Abre una instancia de chromium en headless y abre una página en este navegador
         tab = navegador.new_page()
 
         tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
@@ -48,7 +48,7 @@ def sacaScreenPartidas(url, claseDiv):
             screenshot = Image.open(dirFoto)
             screenshot = screenshot.resize((int(screenshot.width * 1.5),int(screenshot.height*1.5)), Image.LANCZOS) #Lo agranda 150% para que quede mejor en la placa
             screenshot.save(dirFoto)
-            print(f"Se guardo el screenshot de partidas de aeropuertosargentina.com en: {dirFoto}")
+            #print(f"Se guardo el screenshot de partidas de aeropuertosargentina.com en: {dirFoto}")
         else:
             print(f"No se encontro la clase {claseDiv} dentro de la URL especificada. Probablemente hubo cambios la pagina de aeropuertosargentina.com")
 
@@ -64,7 +64,7 @@ def sacaScreenArribos(url, claseDiv):
 
     with sync_playwright() as p:
 
-        navegador = p.chromium.launch(headless=False) #Abre una instancia de chromium en headless y abre una página en este navegador
+        navegador = p.chromium.launch(headless=True) #Abre una instancia de chromium en headless y abre una página en este navegador
         tab = navegador.new_page()
 
         tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
@@ -80,27 +80,29 @@ def sacaScreenArribos(url, claseDiv):
         claseBoton = ".group.inline-flex.items-center.border-b-2.py-2.xl\\:py-2.px-3.lg\\:px-4.font-open.text-sm.font-semibold.leading-4.space-3.cursor-pointer.border-transparent.text-gray-500"
 
         elemArribos = tab.query_selector(f"{claseBoton}") #Hace click en arribos
+
         if elemArribos:
             elemArribos.click()
-
-        
+                
         tab.wait_for_load_state("networkidle")
         time.sleep(1)
 
         elemento = tab.query_selector(claseDiv) #Selecciona el elemento
+
+        time.sleep(1)
 
         if elemento: 
             elemento.screenshot(path = dirFoto) #Si existe le saca screenshot, si no, tira error.
             screenshot = Image.open(dirFoto)
             screenshot = screenshot.resize((int(screenshot.width * 1.5),int(screenshot.height*1.5)), Image.LANCZOS) #Lo agranda 150% para que quede mejor en la placa
             screenshot.save(dirFoto)
-            print(f"Se guardo el screenshot de arribos de aeropuertosargentina.com en: {dirFoto}")
+            #print(f"Se guardo el screenshot de arribos de aeropuertosargentina.com en: {dirFoto}")
         else:
             print(f"No se encontro la clase {claseDiv} dentro de la URL especificada. Probablemente hubo cambios la pagina de aeropuertosargentina.com")
 
         navegador.close()
 
-def cropScreenshotRight(pathFoto,porcentaje = 0.14): #Cropea la foto desde la derecha, si no especifica cuanto, se corta el 14%
+def cropScreenshotRight(pathFoto,porcentaje = 0.137): #Cropea la foto desde la derecha, si no especifica cuanto, se corta el 14%
     screenshot = Image.open(pathFoto)
 
     width, height= screenshot.size

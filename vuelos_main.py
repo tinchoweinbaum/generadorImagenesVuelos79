@@ -35,7 +35,8 @@ def leeTxt():
 
 
 def generaPlaca(dirSalida, url):
-    print("Generando placas...")
+    print("Hora actual: " + time.strftime("%H:%M:%S"))
+    print("Generando placas...\n")
 
     screenshot_py = os.path.join(BASE_DIR, "Utilities", "screenshot.py")
     imgMerger_py = os.path.join(BASE_DIR, "Utilities", "imgMerger.py")
@@ -46,22 +47,25 @@ def generaPlaca(dirSalida, url):
     dirArribos = os.path.join(BASE_DIR, "screenshots", "vuelosArribos.png")
     dirPartidas = os.path.join(BASE_DIR, "screenshots", "vuelosPartidas.png")
 
-    subprocess.run(["python", screenshot_py, url])
-
+    try:
+        subprocess.run(["python", screenshot_py, url])
+    except subprocess.CalledProcessError:
+        print("No se pudieron tomar los screenshots\n")
+        
     dirSalidaArribos = os.path.join(dirSalida, "arribos.bmp")
     subprocess.run(["python", imgMerger_py, dirPlacaArribos, dirArribos, dirSalidaArribos])
 
     dirSalidaPartidas = os.path.join(dirSalida, "partidas.bmp")
     subprocess.run(["python", imgMerger_py, dirPlacaPartidas, dirPartidas, dirSalidaPartidas])
 
+if __name__ == "__main__":
+    dirSalida, url = leeTxt()
 
-dirSalida, url = leeTxt()
+    generaPlaca(dirSalida, url) #Genera placas cuando arranca el programa
 
-generaPlaca(dirSalida, url)
+    print("Esperando a la hora xx:06...")
+    schedule.every().hour.at(":06").do(lambda: generaPlaca(dirSalida, url))
 
-print("Esperando a la hora xx:06...")
-schedule.every().hour.at(":06").do(lambda: generaPlaca(dirSalida, url))
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
