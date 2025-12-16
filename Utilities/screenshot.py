@@ -14,7 +14,7 @@ def paginaActiva(url,timeout = 15):
     except requests.RequestException:
         return False
 
-def sacaScreenshots(url, claseDiv):
+def sacaScreenshots(url):
 
     dirFotoPartidas = os.path.join(BASE_DIR, "..", "screenshots", "vuelosPartidas.png")
 
@@ -78,9 +78,6 @@ def sacaScreenshots(url, claseDiv):
         navegador.close()
 
 if __name__ == "__main__":
-    
-    claseHtml = "html" #Clase del cuadro en bahiablanca
-
 
     if len(sys.argv) < 2:
         print("Uso: python Utilities/screenshot.py *url*")
@@ -88,4 +85,4 @@ if __name__ == "__main__":
 
     url = sys.argv[1]
 
-    sacaScreenshots(url,claseHtml) #Genera los screenshots
+    sacaScreenshots(url) #Genera los screenshots

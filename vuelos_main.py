@@ -2,6 +2,7 @@ import subprocess
 import schedule
 import time
 import os
+import sys
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -52,7 +53,7 @@ def generaPlaca(dirSalida, url):
     dirSalidaPartidas = os.path.join(dirSalida, "partidas.bmp")
 
     try:
-        subprocess.run(["python", screenshot_py, url], check=True)
+        subprocess.run(["python", screenshot_py, url], check=True,timeout=120)
 
         try:
             subprocess.run(["python", imgMerger_py, dirPlacaArribos, dirArribos, dirSalidaArribos],
@@ -67,8 +68,19 @@ def generaPlaca(dirSalida, url):
             print("No se pudo generar la placa de partidas.\n")
 
     except subprocess.CalledProcessError:
-        print("No se pudieron generar las placas")
+        print("No se pudieron generar las placas, fallo la toma de screenshots.")
         return
+    
+    except subprocess.TimeoutExpired:
+        print("Tiempo de espera para sacar screenshots expirado. Reiniciando...")
+        time.sleep(5)
+        # Obtener los argumentos actuales con los que se lanzó el script
+        args = sys.argv[:]
+        args.insert(0, sys.executable) # Asegurar que el intérprete es el primer argumento
+        
+        # Reinicia el script reemplazando el proceso actual
+        os.execv(sys.executable, args) # <--- LÍNEA DE REINICIO
+        
 
 dirSalida, url = leeTxt()
 
