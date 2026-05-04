@@ -5,46 +5,40 @@ from datetime import datetime
 from playwright.sync_api import sync_playwright
 
 def sacaScreenshot(url, seccion, folder):
-    # Definir nombre de archivo
-    if seccion == "salidas":
-        output = os.path.join(folder, "vuelosPartidas.png")
-    else:
-        output = os.path.join(folder, "vuelosArribos.png")
-
-    # Forzar fecha (tu manual del Windows)
+    output = os.path.join(folder, "vuelosPartidas.png" if seccion == "salidas" else "vuelosArribos.png")
     dia_actual = datetime.now().strftime("%d")
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        # Viewport grande para que quepan todos los vuelos del día
-        context = browser.new_context(viewport={'width': 1280, 'height': 8000})
+        # Aumentamos el viewport para asegurar que las filas "existan" para el navegador
+        context = browser.new_context(viewport={'width': 1280, 'height': 10000})
         page = context.new_page()
         
         try:
             print(f"--- Iniciando captura de {seccion} ---")
-            # Usamos la URL tal cual viene del Main
             page.goto(url, wait_until="domcontentloaded", timeout=60000)
-            time.sleep(5) 
+            
+            # 1. Scroll para "despertar" las filas de más abajo
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight / 2)")
+            time.sleep(2)
+            page.evaluate("window.scrollTo(0, 0)")
+            time.sleep(3) 
 
-            # Obtenemos todas las filas de la tabla de Avionio
-            filas = page.query_selector_all("table.tt tr")
+            # 2. Solo buscar filas que NO sean tt-child (filtramos basura)
+            filas = page.query_selector_all("tr.tt-row:not(.tt-child)")
             filas_de_hoy = []
             
             for fila in filas:
                 celda_fecha = fila.query_selector("td.tt-d")
                 if celda_fecha:
                     texto = celda_fecha.inner_text().strip()
-                    # Si la celda contiene el número de tu día (04)
+                    # Verificamos si el día (04) está en el texto de la celda
                     if dia_actual in texto:
                         filas_de_hoy.append(fila)
 
             if filas_de_hoy:
-                # Tomamos la primera y la última fila del grupo para delimitar el área
-                primera_fila = filas_de_hoy[0]
-                ultima_fila = filas_de_hoy[-1]
-
-                box_inicio = primera_fila.bounding_box()
-                box_fin = ultima_fila.bounding_box()
+                box_inicio = filas_de_hoy[0].bounding_box()
+                box_fin = filas_de_hoy[-1].bounding_box()
 
                 if box_inicio and box_fin:
                     os.makedirs(folder, exist_ok=True)
@@ -56,23 +50,22 @@ def sacaScreenshot(url, seccion, folder):
                         "height": (box_fin["y"] + box_fin["height"]) - box_inicio["y"]
                     }
 
-                    # Sacar el screenshot del área específica
                     page.screenshot(path=output, clip=area_recorte)
                     print(f"✅ EXITO: {seccion} guardada en {output}")
+                else:
+                    print(f"❌ Error: No se pudieron calcular las coordenadas de las filas en {seccion}.")
             else:
-                print(f"⚠️ No se encontraron filas para el día {dia_actual} en {seccion}.")
+                print(f"⚠️ No se encontraron vuelos para el día {dia_actual} en {seccion}.")
 
         except Exception as e:
             print(f"❌ Error fatal en {seccion}: {e}")
-        
         finally:
             browser.close()
 
 if __name__ == "__main__":
-    # Ajuste de rutas para que el Main (en la raíz) y este script (en Utilities) coincidan
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     OUTPUT_FOLDER = os.path.normpath(os.path.join(BASE_DIR, "..", "screenshots"))
 
-    # URLs directas a Avionio
+    # IMPORTANTE: Asegurate de usar page=-1 para ver todo el listado
     sacaScreenshot("https://www.avionio.com/es/airport/bhi/departures?page=-1", "salidas", OUTPUT_FOLDER)
     sacaScreenshot("https://www.avionio.com/es/airport/bhi/arrivals?page=-1", "llegadas", OUTPUT_FOLDER)
