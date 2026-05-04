@@ -1,88 +1,78 @@
 import os
-import time
-import requests
 import sys
+import time
+from datetime import datetime
 from playwright.sync_api import sync_playwright
-from PIL import Image
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+def sacaScreenshot(url, seccion, folder):
+    # Definir nombre de archivo
+    if seccion == "salidas":
+        output = os.path.join(folder, "vuelosPartidas.png")
+    else:
+        output = os.path.join(folder, "vuelosArribos.png")
 
-def paginaActiva(url,timeout = 15):
-    try:
-        resp = requests.get(url,timeout = timeout)
-        return resp.status_code == 200
-    except requests.RequestException:
-        return False
-
-def sacaScreenshots(url):
-
-    dirFotoPartidas = os.path.join(BASE_DIR, "..", "screenshots", "vuelosPartidas.png")
-
-    dirFotoArribos = os.path.join(BASE_DIR, "..", "screenshots", "vuelosArribos.png")
-
-    if not paginaActiva:
-        print("La pagina no se encuentra activa.")
-        sys.exit(1)
+    # Forzar fecha (tu manual del Windows)
+    dia_actual = datetime.now().strftime("%d")
 
     with sync_playwright() as p:
-        navegador = p.chromium.launch(headless=True)
-        tab = navegador.new_page()
-
-        tab.goto(url, wait_until="load")
-        tab.wait_for_load_state("networkidle")
-
-        #Entro al iframe
-        iframe_element = tab.frame_locator("iframe[src*='avionio.com'][src*='departures']")
-        #Entro a la tabla dentro del iframe
-        tabla = iframe_element.locator("tbody")
-
-        primer_tr = tabla.locator("tr").first
-
-        tbody_box = tabla.bounding_box()
-        tr_box = primer_tr.bounding_box()
-
-            # defino la región recortada: debajo del primer <tr>
-        clip = {
-            "x": tbody_box["x"],
-            "y": tr_box["y"] + tr_box["height"],   # empieza después del primer tr
-            "width": tbody_box["width"],
-            "height": (tbody_box["y"] + tbody_box["height"]) - (tr_box["y"] + tr_box["height"])
-        }
-
-        # Screenshot de SOLO esa región exacta del iframe
-        tab.screenshot(path=dirFotoPartidas, clip=clip)
-        #print("Screenshot guardado:", dirFotoPartidas)
+        browser = p.chromium.launch(headless=True)
+        # Viewport grande para que quepan todos los vuelos del día
+        context = browser.new_context(viewport={'width': 1280, 'height': 8000})
+        page = context.new_page()
         
-        #Hace lo mismo pero con el iframe de llegadas ahora
-        iframe_element = tab.frame_locator("iframe[src*='avionio.com'][src*='arrivals']")
+        try:
+            print(f"--- Iniciando captura de {seccion} ---")
+            # Usamos la URL tal cual viene del Main
+            page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            time.sleep(5) 
 
-        tabla = iframe_element.locator("tbody")
+            # Obtenemos todas las filas de la tabla de Avionio
+            filas = page.query_selector_all("table.tt tr")
+            filas_de_hoy = []
+            
+            for fila in filas:
+                celda_fecha = fila.query_selector("td.tt-d")
+                if celda_fecha:
+                    texto = celda_fecha.inner_text().strip()
+                    # Si la celda contiene el número de tu día (04)
+                    if dia_actual in texto:
+                        filas_de_hoy.append(fila)
 
-        primer_tr = tabla.locator("tr").first #Toma el primer tr (boton de vuelos anteriores)
+            if filas_de_hoy:
+                # Tomamos la primera y la última fila del grupo para delimitar el área
+                primera_fila = filas_de_hoy[0]
+                ultima_fila = filas_de_hoy[-1]
 
-        tbody_box = tabla.bounding_box() #Se queda con las coordenadas en la pagina de la tabla y el primer tr
-        tr_box = primer_tr.bounding_box()
+                box_inicio = primera_fila.bounding_box()
+                box_fin = ultima_fila.bounding_box()
 
-        # defino la región recortada: debajo del primer <tr>
-        clip = {
-            "x": tbody_box["x"],
-            "y": tr_box["y"] + tr_box["height"],   #toma la parte de la tabla que va despues del primer tr
-            "width": tbody_box["width"],
-            "height": (tbody_box["y"] + tbody_box["height"]) - (tr_box["y"] + tr_box["height"]) #Cropea la parte que no necesita
-        }
+                if box_inicio and box_fin:
+                    os.makedirs(folder, exist_ok=True)
+                    
+                    area_recorte = {
+                        "x": box_inicio["x"],
+                        "y": box_inicio["y"],
+                        "width": box_inicio["width"],
+                        "height": (box_fin["y"] + box_fin["height"]) - box_inicio["y"]
+                    }
 
-        # Screenshot de SOLO esa región exacta del iframe
-        tab.screenshot(path=dirFotoArribos, clip=clip)
-        #print("Screenshot guardado:", dirFotoArribos)
+                    # Sacar el screenshot del área específica
+                    page.screenshot(path=output, clip=area_recorte)
+                    print(f"✅ EXITO: {seccion} guardada en {output}")
+            else:
+                print(f"⚠️ No se encontraron filas para el día {dia_actual} en {seccion}.")
 
-        navegador.close()
+        except Exception as e:
+            print(f"❌ Error fatal en {seccion}: {e}")
+        
+        finally:
+            browser.close()
 
 if __name__ == "__main__":
+    # Ajuste de rutas para que el Main (en la raíz) y este script (en Utilities) coincidan
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    OUTPUT_FOLDER = os.path.normpath(os.path.join(BASE_DIR, "..", "screenshots"))
 
-    if len(sys.argv) < 2:
-        print("Uso: python Utilities/screenshot.py *url*")
-        sys.exit(1)
-
-    url = sys.argv[1]
-
-    sacaScreenshots(url) #Genera los screenshots
+    # URLs directas a Avionio
+    sacaScreenshot("https://www.avionio.com/es/airport/bhi/departures?page=-1", "salidas", OUTPUT_FOLDER)
+    sacaScreenshot("https://www.avionio.com/es/airport/bhi/arrivals?page=-1", "llegadas", OUTPUT_FOLDER)
