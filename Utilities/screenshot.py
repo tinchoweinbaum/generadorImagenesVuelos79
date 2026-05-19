@@ -1,144 +1,66 @@
-"Esto está recontra hardcodeado. Ignora completamente el argumento que recibe y usa la url de avionio"
-
 import os
 import sys
 import time
 from datetime import datetime
 from playwright.sync_api import sync_playwright
-import os
-import time
-from datetime import datetime
-from playwright.sync_api import sync_playwright
 
 def sacaScreenshot(url, seccion, folder):
-
     output = os.path.join(folder, "vuelosPartidas.png" if seccion == "salidas" else "vuelosArribos.png")
-
     dia_actual = datetime.now().strftime("%d")
-
 
     if os.path.exists(output): os.remove(output)
 
-
     with sync_playwright() as p:
-
         browser = p.chromium.launch(headless=True)
-
-        context = browser.new_context(viewport={'width': 1280, 'height': 5000})
-
+        context = browser.new_context(
+            viewport={'width': 1280, 'height': 5000},
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            locale='es-AR',       # Fuerza el idioma español de Argentina
+            timezone_id='America/Argentina/Buenos_Aires' # Clava la zona horaria local para que las horas coincidan
+        )
         page = context.new_page()
         try:
+            page.goto(url)
+            
+            # Un pequeño delay para asegurar la carga visual antes de medir
+            time.sleep(4)
 
-            page.goto(url, wait_until="networkidle")
-
-           
-
-            # Buscamos filas del día actual
-
+            # --- PASO 1: FILTRAR SOLO HOY ---
+            # Capturamos únicamente las filas reales de vuelos que tengan el número de día de hoy
             filas_hoy = [f for f in page.query_selector_all("tr.tt-row:not(.tt-child)")
-
                          if dia_actual in (f.query_selector("td.tt-d").inner_text() if f.query_selector("td.tt-d") else "")]
 
-
             if filas_hoy:
-
-                # Buscamos todas las filas de la tabla para saber cuál es el fondo real de la página
-
-                todas_las_filas = page.query_selector_all("table.tt tr")
-
-               
-
-                # Tu lógica original: el inicio es el primer vuelo de hoy
-
-                # Pero el fin lo obligamos a ser el último elemento real de la tabla para que no se coma nada
-
-                target_rows = [filas_hoy[0], todas_las_filas[-1]] if todas_las_filas else [filas_hoy[0], filas_hoy[-1]]
-
+                # El inicio de la captura es el primer vuelo de hoy, el fin es el último vuelo de hoy
+                target_rows = [filas_hoy[0], filas_hoy[-1]]
             else:
-
-                # Buscamos todas las filas
-
+                # Si por alguna razón quedó vacía, usamos el último elemento disponible de la tabla por seguridad
                 todas_las_filas = page.query_selector_all("table.tt tr")
+                target_rows = [todas_las_filas[-1], todas_las_filas[-1]] if todas_las_filas else []
 
-   
-
-                if todas_las_filas:
-
-                    # Seleccionamos forzosamente la última fila
-
-                    ultimo_elemento = todas_las_filas[-1]
-
-                   
-
-                    # Hacemos click en el último elemento (el cartel de 'Ver más' o similar)
-
-                    ultimo_elemento.click()
-
-                   
-
-                    # Esperamos a que la web cargue el mensaje de "Sin vuelos"
-
-                    time.sleep(3)
-
-                   
-
-                    # Refrescamos la lista tras el click
-
-                    todas_las_filas = page.query_selector_all("table.tt tr")
-
-                    target_rows = [todas_las_filas[-1], todas_las_filas[-1]]
-
-                else:
-
-                    target_rows = []
-
-
+            # --- PASO 2: RECORTE Y CAPTURA ---
             if target_rows:
-
                 box_inicio = target_rows[0].bounding_box()
-
                 box_fin = target_rows[-1].bounding_box()
 
-
                 if box_inicio and box_fin:
-
                     area = {
-
                         "x": box_inicio["x"],
-
                         "y": box_inicio["y"],
-
                         "width": box_inicio["width"],
-
                         "height": max(100, (box_fin["y"] + box_fin["height"]) - box_inicio["y"])
-
                     }
-
-                   
-
                     os.makedirs(folder, exist_ok=True)
-
                     page.screenshot(path=output, clip=area)
 
-
         except Exception as e:
-
             print(f"Error al sacar screenshot de {seccion}: {e}")
-
         finally:
-
             browser.close()
 
-
 if __name__ == "__main__":
-
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
     OUTPUT_FOLDER = os.path.normpath(os.path.join(BASE_DIR, "..", "screenshots"))
 
-
-    # IMPORTANTE: Asegurate de usar page=-1 para ver todo el listado
-
-    sacaScreenshot("https://www.avionio.com/es/airport/bhi/departures?page=-1", "salidas", OUTPUT_FOLDER)
-
-    sacaScreenshot("https://www.avionio.com/es/airport/bhi/arrivals?page=-1", "llegadas", OUTPUT_FOLDER) 
+    sacaScreenshot("https://www.avionio.com/es/airport/bhi/departures", "salidas", OUTPUT_FOLDER)
+    sacaScreenshot("https://www.avionio.com/es/airport/bhi/arrivals", "llegadas", OUTPUT_FOLDER)

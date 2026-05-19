@@ -1,5 +1,6 @@
 """
-Esta es la peor cosa que programé en mi vida y la odio.
+Esta es la peor mierda que programé en mi vida y la odio.
+No se porque en vez de uasr módulos hice que los programas se corran entre sí. Soy literal retrasado.
 """
 
 import subprocess
