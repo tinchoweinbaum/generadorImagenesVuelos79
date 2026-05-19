@@ -1,3 +1,7 @@
+"""
+Esta es la peor cosa que programé en mi vida y la odio.
+"""
+
 import subprocess
 import schedule
 import time
