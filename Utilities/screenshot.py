@@ -1,66 +1,88 @@
 import os
-import sys
 import time
-from datetime import datetime
+import requests
+import sys
 from playwright.sync_api import sync_playwright
+from PIL import Image
 
-def sacaScreenshot(url, seccion, folder):
-    output = os.path.join(folder, "vuelosPartidas.png" if seccion == "salidas" else "vuelosArribos.png")
-    dia_actual = datetime.now().strftime("%d")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-    if os.path.exists(output): os.remove(output)
+def paginaActiva(url,timeout = 15):
+    try:
+        resp = requests.get(url,timeout = timeout)
+        return resp.status_code == 200
+    except requests.RequestException:
+        return False
+
+def sacaScreenshots(url):
+
+    dirFotoPartidas = os.path.join(BASE_DIR, "..", "screenshots", "vuelosPartidas.png")
+
+    dirFotoArribos = os.path.join(BASE_DIR, "..", "screenshots", "vuelosArribos.png")
+
+    if not paginaActiva:
+        print("La pagina no se encuentra activa.")
+        sys.exit(1)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(
-            viewport={'width': 1280, 'height': 5000},
-            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            locale='es-AR',       # Fuerza el idioma español de Argentina
-            timezone_id='America/Argentina/Buenos_Aires' # Clava la zona horaria local para que las horas coincidan
-        )
-        page = context.new_page()
-        try:
-            page.goto(url)
-            
-            # Un pequeño delay para asegurar la carga visual antes de medir
-            time.sleep(4)
+        navegador = p.chromium.launch(headless=True)
+        tab = navegador.new_page()
 
-            # --- PASO 1: FILTRAR SOLO HOY ---
-            # Capturamos únicamente las filas reales de vuelos que tengan el número de día de hoy
-            filas_hoy = [f for f in page.query_selector_all("tr.tt-row:not(.tt-child)")
-                         if dia_actual in (f.query_selector("td.tt-d").inner_text() if f.query_selector("td.tt-d") else "")]
+        tab.goto(url, wait_until="load")
+        tab.wait_for_load_state("networkidle")
 
-            if filas_hoy:
-                # El inicio de la captura es el primer vuelo de hoy, el fin es el último vuelo de hoy
-                target_rows = [filas_hoy[0], filas_hoy[-1]]
-            else:
-                # Si por alguna razón quedó vacía, usamos el último elemento disponible de la tabla por seguridad
-                todas_las_filas = page.query_selector_all("table.tt tr")
-                target_rows = [todas_las_filas[-1], todas_las_filas[-1]] if todas_las_filas else []
+        #Entro al iframe
+        iframe_element = tab.frame_locator("iframe[src*='avionio.com'][src*='departures']")
+        #Entro a la tabla dentro del iframe
+        tabla = iframe_element.locator("tbody")
 
-            # --- PASO 2: RECORTE Y CAPTURA ---
-            if target_rows:
-                box_inicio = target_rows[0].bounding_box()
-                box_fin = target_rows[-1].bounding_box()
+        primer_tr = tabla.locator("tr").first
 
-                if box_inicio and box_fin:
-                    area = {
-                        "x": box_inicio["x"],
-                        "y": box_inicio["y"],
-                        "width": box_inicio["width"],
-                        "height": max(100, (box_fin["y"] + box_fin["height"]) - box_inicio["y"])
-                    }
-                    os.makedirs(folder, exist_ok=True)
-                    page.screenshot(path=output, clip=area)
+        tbody_box = tabla.bounding_box()
+        tr_box = primer_tr.bounding_box()
 
-        except Exception as e:
-            print(f"Error al sacar screenshot de {seccion}: {e}")
-        finally:
-            browser.close()
+            # defino la región recortada: debajo del primer <tr>
+        clip = {
+            "x": tbody_box["x"],
+            "y": tr_box["y"] + tr_box["height"],   # empieza después del primer tr
+            "width": tbody_box["width"],
+            "height": (tbody_box["y"] + tbody_box["height"]) - (tr_box["y"] + tr_box["height"])
+        }
+
+        # Screenshot de SOLO esa región exacta del iframe
+        tab.screenshot(path=dirFotoPartidas, clip=clip)
+        #print("Screenshot guardado:", dirFotoPartidas)
+        
+        #Hace lo mismo pero con el iframe de llegadas ahora
+        iframe_element = tab.frame_locator("iframe[src*='avionio.com'][src*='arrivals']")
+
+        tabla = iframe_element.locator("tbody")
+
+        primer_tr = tabla.locator("tr").first #Toma el primer tr (boton de vuelos anteriores)
+
+        tbody_box = tabla.bounding_box() #Se queda con las coordenadas en la pagina de la tabla y el primer tr
+        tr_box = primer_tr.bounding_box()
+
+        # defino la región recortada: debajo del primer <tr>
+        clip = {
+            "x": tbody_box["x"],
+            "y": tr_box["y"] + tr_box["height"],   #toma la parte de la tabla que va despues del primer tr
+            "width": tbody_box["width"],
+            "height": (tbody_box["y"] + tbody_box["height"]) - (tr_box["y"] + tr_box["height"]) #Cropea la parte que no necesita
+        }
+
+        # Screenshot de SOLO esa región exacta del iframe
+        tab.screenshot(path=dirFotoArribos, clip=clip)
+        #print("Screenshot guardado:", dirFotoArribos)
+
+        navegador.close()
 
 if __name__ == "__main__":
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    OUTPUT_FOLDER = os.path.normpath(os.path.join(BASE_DIR, "..", "screenshots"))
 
-    sacaScreenshot("https://www.avionio.com/es/airport/bhi/departures", "salidas", OUTPUT_FOLDER)
-    sacaScreenshot("https://www.avionio.com/es/airport/bhi/arrivals", "llegadas", OUTPUT_FOLDER)
+    if len(sys.argv) < 2:
+        print("Uso: python Utilities/screenshot.py *url*")
+        sys.exit(1)
+
+    url = sys.argv[1]
+
+    sacaScreenshots(url) #Genera los screenshots

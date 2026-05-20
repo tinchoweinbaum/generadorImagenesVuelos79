@@ -20,6 +20,11 @@ def generaImg(placaPath, vuelosPath, salidaDir):
     placa = Image.open(placaPath).convert("RGBA")
     vuelos = Image.open(vuelosPath).convert("RGBA")
 
+    vuelos = vuelos.resize(
+        (vuelos.width * 3, vuelos.height * 3),
+        Image.LANCZOS
+    )
+
     # 1. Ajuste de ancho fijo a 1920
     # Esto mantiene la proporción pero asegura que cubra la pantalla de lado a lado
     nuevo_ancho = 1920
