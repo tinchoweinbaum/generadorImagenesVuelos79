@@ -92,8 +92,8 @@ dirSalida, url = leeTxt()
 generaPlaca(dirSalida, url)
 
 print("\nEsperando a la hora xx:10...")
-schedule.every().hour.at(":37").do(lambda: generaPlaca(dirSalida, url))
+schedule.every().hour.at(":10").do(lambda: generaPlaca(dirSalida, url))
 
 while True:
     schedule.run_pending()
-    time.sleep(2.5)
+    time.sleep(10)
