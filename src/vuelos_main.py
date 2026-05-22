@@ -1,4 +1,3 @@
-import subprocess
 import schedule
 import time
 import os
@@ -36,53 +35,21 @@ def leeTxt():
     except FileNotFoundError:
         return default_dir, default_url
 
-
 def generaPlaca(dirSalida, url):
-    print("")
     print("Hora actual: " + time.strftime("%H:%M:%S"))
     print("Generando placas...\n")
+    dirPlacaArribos = os.path.join(BASE_DIR, "..", "placas", "placaArribos.png") # Dirección de las placas vacías
+    dirPlacaPartidas = os.path.join(BASE_DIR, "..", "placas", "placaPartidas.png")
 
-    screenshot_py = os.path.join(BASE_DIR, "Utilities", "screenshot.py")
-    imgMerger_py = os.path.join(BASE_DIR, "Utilities", "imgMerger.py")
-
-    dirPlacaArribos = os.path.join(BASE_DIR, "placas", "placaArribos.png")
-    dirPlacaPartidas = os.path.join(BASE_DIR, "placas", "placaPartidas.png")
-
-    dirArribos = os.path.join(BASE_DIR, "screenshots", "vuelosArribos.png")
-    dirPartidas = os.path.join(BASE_DIR, "screenshots", "vuelosPartidas.png")
-
-    dirSalidaArribos = os.path.join(dirSalida, "arribos.bmp")
-    dirSalidaPartidas = os.path.join(dirSalida, "partidas.bmp")
+    dirScreenshots = os.path.join(BASE_DIR, "..", "screenshots") # Dirección de la carpeta donde se guardan los screens
+    claseHtml = r".flex.flex-col.space-5.mb-6.xl\:mb-8.w-full" #Clase HTML del cuadro de vuelos
 
     try:
-        subprocess.run(["python", screenshot_py, url], check=True)
-
-        try:
-            subprocess.run(["python", imgMerger_py, dirPlacaArribos, dirArribos, dirSalidaArribos], check=True)
-        except subprocess.CalledProcessError:
-            print("No se pudo generar la placa de arribos.\n")
-
-        try:
-            subprocess.run(["python", imgMerger_py, dirPlacaPartidas, dirPartidas, dirSalidaPartidas], check=True)
-        except subprocess.CalledProcessError:
-            print("No se pudo generar la placa de partidas.\n")
-
-    except subprocess.CalledProcessError:
-        print("No se pudieron generar las placas")
-        return
-    
-def generaPlaca(dirSalida, url):
-    dirPlacaArribos = os.path.join(BASE_DIR, "placas", "placaArribos.png")
-    dirPlacaPartidas = os.path.join(BASE_DIR, "placas", "placaPartidas.png")
-
-    try:
-        dirScreenArribos, dirScreenPartidas = sacaScreenshots(dirSalida, url) # Saca los screenshots de la página
+        dirScreenArribos, dirScreenPartidas = sacaScreenshots(dirScreenshots, url, claseHtml) # Saca los screenshots de la página y guarda sus paths.
         time.sleep(2)
-
-        generaPlacas_aire(dirPlacaArribos, dirPlacaPartidas, dirSalida)
-
-
-
+        generaPlacas_aire(dirSalida, dirScreenArribos, dirScreenPartidas, dirPlacaArribos, dirPlacaPartidas) # Combina screenshots con placas.
+    except Exception as e:
+        print(f"No se pudieron generar las placas.")
 
 if __name__ == "__main__":
     dirSalida, url = leeTxt()

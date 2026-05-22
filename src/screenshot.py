@@ -107,42 +107,32 @@ def cropScreenshotRight(pathFoto,porcentaje = 0.137): #Cropea la foto desde la d
     screenshot = screenshot.crop(tuplaSize)
     screenshot.save(pathFoto)
 
-def sacaScreenshots(dirSalida, url):
+def sacaScreenshots(dirScreenshots, url, claseHtml):
     """
-    Recibe la url de aa2000, junto con la carpeta de salida para generar los 2 screenshots, devuelve la dirección en la que guardó los screenshots.
+    Recibe la url de aa2000, junto con la carpeta de salida y la clase html del cuadro para generar los 2 screenshots, devuelve la dirección en la que guardó los screenshots.
     """
-    dirScreenArribos = os.path.join(BASE_DIR, dirSalida, "vuelosArribos.png")
-    dirScreenPartidas = os.path.join(BASE_DIR, "..", dirSalida, "vuelosPartidas.png")
+    dirScreenArribos = os.path.join(dirScreenshots, "vuelosArribos.png")
+    dirScreenPartidas = os.path.join(dirScreenshots, "vuelosPartidas.png")
 
-    # *saca las dos fotos*
+    sacaScreenArribos(url, claseHtml)
+    # print(f"Screenshot guardado en {dirScreenArribos}")
+
+    sacaScreenPartidas(url, claseHtml)
+    # print(f"Screenshot guardado en {dirScreenPartidas}")
+
+    try:
+        cropScreenshotRight(dirScreenPartidas)
+    except FileNotFoundError:
+        print("No se pudo recortar la imagen de las partidas")
+        return
     
+    try:
+        cropScreenshotRight(dirScreenArribos)
+    except FileNotFoundError:
+        print("No se pudo recortar la imagen de los arribos")
+        return
+
     return dirScreenArribos, dirScreenPartidas
 
 if __name__ == "__main__":
-    
-    claseHtml = r".flex.flex-col.space-5.mb-6.xl\:mb-8.w-full" #Clase HTML del cuadro de vuelos
-
-    if len(sys.argv) < 2:
-        print("Uso: python Utilities/screenshot.py *url*")
-        sys.exit(1)
-
-    url = sys.argv[1]
-
-    sacaScreenPartidas(url,claseHtml) #Genera el screenshot de las Partidas
-    sacaScreenArribos(url,claseHtml) #General el screenshot de los Arribos
-
-    pathScreenshotPartidas = os.path.join(BASE_DIR, "..", "screenshots", "vuelosPartidas.png")  #Cropea las imágenes
-
-    try:
-        cropScreenshotRight(pathScreenshotPartidas)
-    except FileNotFoundError:
-        print("no cropie")
-        sys.exit(1)
-
-    pathScreenshotArribos = os.path.join(BASE_DIR, "..", "screenshots", "vuelosArribos.png")
-
-    try:
-        cropScreenshotRight(pathScreenshotArribos)
-    except FileNotFoundError:
-        print("no cropie 2")
-        sys.exit(1)
+    pass

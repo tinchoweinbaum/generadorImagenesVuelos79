@@ -44,11 +44,17 @@ def generaImg(placaPath, vuelosPath, salidaDir):
     resultado.save(salidaDir)
     print(f"Placa creada en {salidaDir}.")
 
-def generaPlacas_aire(screenArribos, screenVuelos, placaArribos, placaVuelos):
+def generaPlacas_aire(dirSalida, screenArribos, screenPartidas, placaArribos, placaPartidas):
     """
     Recibe la dirección de los 2 screenshots junto con la de las placas. Genera las placas finales y devuelve la dirección de estas (no usado)
     """
-    pass
+    dirFinalArribos = os.path.join(dirSalida, "arribos.bmp")
+    generaImg(placaArribos, screenArribos, dirFinalArribos)
+
+    dirFinalPartidas = os.path.join(dirSalida, "partidas.bmp")
+    generaImg(placaPartidas, screenPartidas, dirFinalPartidas)
+
+    return dirFinalArribos, dirFinalPartidas
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
