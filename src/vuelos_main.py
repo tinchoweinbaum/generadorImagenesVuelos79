@@ -5,7 +5,6 @@ import os
 from screenshot import sacaScreenshots
 from imgMerger import generaPlacas_aire
 
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def leeTxt():
