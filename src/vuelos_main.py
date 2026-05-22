@@ -3,6 +3,9 @@ import schedule
 import time
 import os
 
+from screenshot import sacaScreenshots
+from imgMerger import generaPlacas_aire
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -67,6 +70,19 @@ def generaPlaca(dirSalida, url):
     except subprocess.CalledProcessError:
         print("No se pudieron generar las placas")
         return
+    
+def generaPlaca(dirSalida, url):
+    dirPlacaArribos = os.path.join(BASE_DIR, "placas", "placaArribos.png")
+    dirPlacaPartidas = os.path.join(BASE_DIR, "placas", "placaPartidas.png")
+
+    try:
+        dirScreenArribos, dirScreenPartidas = sacaScreenshots(dirSalida, url) # Saca los screenshots de la página
+        time.sleep(2)
+
+        generaPlacas_aire(dirPlacaArribos, dirPlacaPartidas, dirSalida)
+
+
+
 
 if __name__ == "__main__":
     dirSalida, url = leeTxt()

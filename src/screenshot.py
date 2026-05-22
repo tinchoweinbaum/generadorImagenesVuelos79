@@ -107,6 +107,17 @@ def cropScreenshotRight(pathFoto,porcentaje = 0.137): #Cropea la foto desde la d
     screenshot = screenshot.crop(tuplaSize)
     screenshot.save(pathFoto)
 
+def sacaScreenshots(dirSalida, url):
+    """
+    Recibe la url de aa2000, junto con la carpeta de salida para generar los 2 screenshots, devuelve la dirección en la que guardó los screenshots.
+    """
+    dirScreenArribos = os.path.join(BASE_DIR, dirSalida, "vuelosArribos.png")
+    dirScreenPartidas = os.path.join(BASE_DIR, "..", dirSalida, "vuelosPartidas.png")
+
+    # *saca las dos fotos*
+    
+    return dirScreenArribos, dirScreenPartidas
+
 if __name__ == "__main__":
     
     claseHtml = r".flex.flex-col.space-5.mb-6.xl\:mb-8.w-full" #Clase HTML del cuadro de vuelos

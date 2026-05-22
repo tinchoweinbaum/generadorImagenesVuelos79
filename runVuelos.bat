@@ -1,1 +1,1 @@
-C:\Users\Operador\AppData\Local\Programs\Python\Python314\python.exe vuelos_main.py
+python src/vuelos_main.py
