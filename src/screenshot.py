@@ -5,76 +5,74 @@ import sys
 from playwright.sync_api import sync_playwright
 from PIL import Image
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Importamos getPath desde tu archivo principal
+def getPath(ruta_relativa):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, ruta_relativa)
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ruta_relativa)
 
-def paginaActiva(url,timeout = 15):
+def paginaActiva(url, timeout=15):
     try:
-        resp = requests.get(url,timeout = timeout)
+        resp = requests.get(url, timeout=timeout)
         return resp.status_code == 200
     except requests.RequestException:
         return False
 
-
 def sacaScreenPartidas(url, claseDiv):
-
-    dirFoto = os.path.join(BASE_DIR, "..", "screenshots", "vuelosPartidas.png")
+    # RUTA CORREGIDA: Usamos getPath
+    dirFoto = getPath("screenshots/vuelosPartidas.png")
 
     if(not paginaActiva(url)):
        print("La pagina no se encuentra activa, no existe, o tardo demasiado en responder.")
        exit()
 
     with sync_playwright() as p:
-        navegador = p.chromium.launch(headless=True) #Abre una instancia de chromium en headless y abre una página en este navegador
+        navegador = p.chromium.launch(headless=True)
         tab = navegador.new_page()
 
-        tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
+        tab.goto(url, wait_until="load")
         tab.wait_for_load_state("networkidle")
 
         claseCerrar = ".fill-none.stroke-white"
-       
         elemCerrar = tab.query_selector(f"{claseCerrar}")
         if claseCerrar:
-            elemCerrar.click()
+            # Añadido chequeo de existencia antes de hacer click
+            if elemCerrar: elemCerrar.click()
 
-        elemento = tab.query_selector(claseDiv) #Selecciona el elemento
+        elemento = tab.query_selector(claseDiv)
 
         if elemento: 
-            elemento.screenshot(path = dirFoto) #Si existe le saca screenshot, si no, tira error.
+            elemento.screenshot(path=dirFoto)
             screenshot = Image.open(dirFoto)
-            screenshot = screenshot.resize((int(screenshot.width * 1.5),int(screenshot.height*1.5)), Image.LANCZOS) #Lo agranda 150% para que quede mejor en la placa
+            screenshot = screenshot.resize((int(screenshot.width * 1.5), int(screenshot.height * 1.5)), Image.LANCZOS)
             screenshot.save(dirFoto)
-            #print(f"Se guardo el screenshot de partidas de aeropuertosargentina.com en: {dirFoto}")
         else:
-            print(f"No se encontro la clase {claseDiv} dentro de la URL especificada. Probablemente hubo cambios la pagina de aeropuertosargentina.com")
+            print(f"No se encontro la clase {claseDiv}")
 
         navegador.close()
 
 def sacaScreenArribos(url, claseDiv):
-
-    dirFoto = os.path.join(BASE_DIR, "..", "screenshots", "vuelosArribos.png")
+    # RUTA CORREGIDA: Usamos getPath
+    dirFoto = getPath("screenshots/vuelosArribos.png")
 
     if(not paginaActiva(url)):
        print("La pagina no se encuentra activa, no existe, o tardo demasiado en responder.")
        sys.exit(1)
 
     with sync_playwright() as p:
-
-        navegador = p.chromium.launch(headless=True) #Abre una instancia de chromium en headless y abre una página en este navegador
+        navegador = p.chromium.launch(headless=True)
         tab = navegador.new_page()
 
-        tab.goto(url, wait_until="load") #Va a la url y espera a que cargue
+        tab.goto(url, wait_until="load")
         tab.wait_for_load_state("networkidle")
 
         claseCerrar = ".fill-none.stroke-white"
-       
         elemCerrar = tab.query_selector(f"{claseCerrar}")
-        if claseCerrar:
+        if elemCerrar:
             elemCerrar.click()
 
-
         claseBoton = ".group.inline-flex.items-center.border-b-2.py-2.xl\\:py-2.px-3.lg\\:px-4.font-open.text-sm.font-semibold.leading-4.space-3.cursor-pointer.border-transparent.text-gray-500"
-
-        elemArribos = tab.query_selector(f"{claseBoton}") #Hace click en arribos
+        elemArribos = tab.query_selector(f"{claseBoton}")
 
         if elemArribos:
             elemArribos.click()
@@ -82,43 +80,34 @@ def sacaScreenArribos(url, claseDiv):
         tab.wait_for_load_state("networkidle")
         time.sleep(1)
 
-        elemento = tab.query_selector(claseDiv) #Selecciona el elemento
-
+        elemento = tab.query_selector(claseDiv)
         time.sleep(1)
 
         if elemento: 
-            elemento.screenshot(path = dirFoto) #Si existe le saca screenshot, si no, tira error.
+            elemento.screenshot(path=dirFoto)
             screenshot = Image.open(dirFoto)
-            screenshot = screenshot.resize((int(screenshot.width * 1.5),int(screenshot.height*1.5)), Image.LANCZOS) #Lo agranda 150% para que quede mejor en la placa
+            screenshot = screenshot.resize((int(screenshot.width * 1.5), int(screenshot.height * 1.5)), Image.LANCZOS)
             screenshot.save(dirFoto)
-            #print(f"Se guardo el screenshot de arribos de aeropuertosargentina.com en: {dirFoto}")
         else:
-            print(f"No se encontro la clase {claseDiv} dentro de la URL especificada. Probablemente hubo cambios la pagina de aeropuertosargentina.com")
+            print(f"No se encontro la clase {claseDiv}")
 
         navegador.close()
 
-def cropScreenshotRight(pathFoto,porcentaje = 0.137): #Cropea la foto desde la derecha, si no especifica cuanto, se corta el 14%
+def cropScreenshotRight(pathFoto, porcentaje=0.137):
     screenshot = Image.open(pathFoto)
-
-    width, height= screenshot.size
-    widthCrop = int(width*(1 - porcentaje)) #Se calcula el nuevo ancho de la imagen
-    tuplaSize = (0,0,widthCrop,height)
-
+    width, height = screenshot.size
+    widthCrop = int(width * (1 - porcentaje))
+    tuplaSize = (0, 0, widthCrop, height)
     screenshot = screenshot.crop(tuplaSize)
     screenshot.save(pathFoto)
 
 def sacaScreenshots(dirScreenshots, url, claseHtml):
-    """
-    Recibe la url de aa2000, junto con la carpeta de salida y la clase html del cuadro para generar los 2 screenshots, devuelve la dirección en la que guardó los screenshots.
-    """
-    dirScreenArribos = os.path.join(dirScreenshots, "vuelosArribos.png")
-    dirScreenPartidas = os.path.join(dirScreenshots, "vuelosPartidas.png")
+    # RUTA CORREGIDA: Usamos getPath para los archivos dentro de la carpeta
+    dirScreenArribos = getPath("screenshots/vuelosArribos.png")
+    dirScreenPartidas = getPath("screenshots/vuelosPartidas.png")
 
     sacaScreenArribos(url, claseHtml)
-    # print(f"Screenshot guardado en {dirScreenArribos}")
-
     sacaScreenPartidas(url, claseHtml)
-    # print(f"Screenshot guardado en {dirScreenPartidas}")
 
     try:
         cropScreenshotRight(dirScreenPartidas)
@@ -133,6 +122,3 @@ def sacaScreenshots(dirScreenshots, url, claseHtml):
         return
 
     return dirScreenArribos, dirScreenPartidas
-
-if __name__ == "__main__":
-    pass

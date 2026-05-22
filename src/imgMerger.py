@@ -2,6 +2,11 @@ from PIL import Image
 import sys
 import os
 
+def getPath(ruta_relativa):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, ruta_relativa)
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ruta_relativa)
+
 def verificar_archivo(path):
     """Verifica que un archivo exista y sea accesible."""
     if not os.path.isfile(path):
@@ -17,7 +22,7 @@ def verificar_archivo(path):
         print(f"\nERROR: No se pudo leer {path}\n{e}")
         return False
     
-    return True #Si llega al final de la funcion es que exsite
+    return True 
 
 def generaImg(placaPath, vuelosPath, salidaDir):
 
@@ -36,8 +41,8 @@ def generaImg(placaPath, vuelosPath, salidaDir):
 
     # Crear nueva imagen combinada (RGBA)
     resultado = Image.new("RGBA", placa.size)
-    resultado.paste(placa, (0, 0)) #Copia la placa de vuelos a una nueva imagen para pegarle los vuelos encima
-    resultado.paste(vuelos, (posX, posY), vuelos)  #Pega la imagen de vuelos encima de la placa, en el centro.
+    resultado.paste(placa, (0, 0)) 
+    resultado.paste(vuelos, (posX, posY), vuelos)
 
     # Guardar en formato compatible
     os.makedirs(os.path.dirname(salidaDir), exist_ok=True)
@@ -46,8 +51,9 @@ def generaImg(placaPath, vuelosPath, salidaDir):
 
 def generaPlacas_aire(dirSalida, screenArribos, screenPartidas, placaArribos, placaPartidas):
     """
-    Recibe la dirección de los 2 screenshots junto con la de las placas. Genera las placas finales y devuelve la dirección de estas (no usado)
+    Recibe la dirección de los 2 screenshots junto con la de las placas.
     """
+    # Se asegura que el directorio de salida sea absoluto
     dirFinalArribos = os.path.join(dirSalida, "arribos.bmp")
     generaImg(placaArribos, screenArribos, dirFinalArribos)
 
