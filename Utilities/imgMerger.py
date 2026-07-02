@@ -20,34 +20,31 @@ def generaImg(placaPath, vuelosPath, salidaDir):
     placa = Image.open(placaPath).convert("RGBA")
     vuelos = Image.open(vuelosPath).convert("RGBA")
 
-    vuelos = vuelos.resize(
-        (vuelos.width * 3, vuelos.height * 3),
-        Image.LANCZOS
-    )
+    # 1. REDIMENSIONAR LA IMAGEN
+    # Opción A: Escalar por porcentaje (Ej: 0.8 achica la imagen al 80%)
+    escala = 2.5
+    nuevo_ancho = int(vuelos.width * escala)
+    nuevo_alto = int(vuelos.height * escala)
 
-    # 1. Ajuste de ancho fijo a 1920
-    # Esto mantiene la proporción pero asegura que cubra la pantalla de lado a lado
-    nuevo_ancho = 1920
-    proporcion = nuevo_ancho / float(vuelos.width)
-    nuevo_alto = int(float(vuelos.height) * proporcion)
+    # Opción B: Forzar un ancho específico menor a 1920 (Descomenta estas 3 líneas si prefieres esto)
+    # nuevo_ancho = 1500  # Cambia esto al ancho que prefieras
+    # proporcion = nuevo_ancho / float(vuelos.width)
+    # nuevo_alto = int(float(vuelos.height) * proporcion)
 
     vuelos = vuelos.resize((nuevo_ancho, nuevo_alto), Image.LANCZOS)
 
-    # 2. POSICIONAMIENTO FIJO (El "Ancla")
-    # En lugar de centrar verticalmente, fijamos donde empieza la tabla.
-    # Según tu configuración anterior donde con 4 vuelos quedaba bien:
+    # 2. POSICIONAMIENTO
+    # Como ahora la imagen es más chica que 1920, la centramos matemáticamente en el eje X
     posX = 0
     
-    # Ajustamos posY para que sea una constante. 
-    # Si antes usabas (placa.height * 0.29) aprox, lo fijamos ahí:
-    posY = 310  # <--- AJUSTÁ ESTE VALOR (en píxeles) para que alinee con el cabezal de tu placa
+    # Posición Y fija (el "Ancla") alineada al cabezal
+    posY = 310  
 
-    # 3. Crear resultado
+    # 3. CREAR RESULTADO
     resultado = Image.new("RGBA", (1920, 1080))
     resultado.paste(placa, (0, 0)) 
     
-    # Pegamos los vuelos. Si hay pocos, quedará espacio libre ABAJO (lo cual es natural).
-    # Si hay muchos, crecerá hacia abajo.
+    # Pegamos los vuelos usando la misma imagen como máscara alfa para conservar transparencias
     resultado.paste(vuelos, (posX, posY), vuelos)
 
     os.makedirs(os.path.dirname(salidaDir), exist_ok=True)
