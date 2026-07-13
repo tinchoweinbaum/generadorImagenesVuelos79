@@ -1,6 +1,7 @@
 from PIL import Image, UnidentifiedImageError
 import sys
 import os
+import time
 
 def verificar_archivo(path):
     if not os.path.isfile(path):
@@ -51,7 +52,12 @@ def generaImg(placaPath, vuelosPath, salidaDir):
     resultado.save(salidaDir)
     print(f"Placa creada en {salidaDir}.")
 
+def generaPlacas_aire(dirSalida, dirScreenArribos, dirScreenPartidas, dirPlacaArribos, dirPlacaPartidas):
+    dirFinalArribos = os.path.join(dirSalida, "arribos.bmp")
+    generaImg(dirPlacaArribos, dirScreenArribos, dirFinalArribos)
+    
+    dirFinalPartidas = os.path.join(dirSalida, "partidas.bmp")
+    generaImg(dirPlacaPartidas, dirScreenPartidas, dirFinalPartidas)
+
 if __name__ == "__main__":
-    if len(sys.argv) < 4:
-        sys.exit(1)
-    generaImg(sys.argv[1], sys.argv[2], sys.argv[3])
+    pass

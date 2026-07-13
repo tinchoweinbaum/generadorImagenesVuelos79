@@ -7,6 +7,15 @@ from PIL import Image
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+def getPath(ruta_relativa):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, ruta_relativa)
+    
+    # Busca la carpeta padre de "src"
+    base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+    # abspath resuelve el ".." y te devuelve una ruta limpia (ej: C:\...\placas\imagen.png)
+    return os.path.abspath(os.path.join(base, ruta_relativa))
+
 def paginaActiva(url,timeout = 15):
     try:
         resp = requests.get(url,timeout = timeout)
@@ -16,11 +25,11 @@ def paginaActiva(url,timeout = 15):
 
 def sacaScreenshots(url):
 
-    dirFotoPartidas = os.path.join(BASE_DIR, "..", "screenshots", "vuelosPartidas.png")
+    dirScreenArribos = getPath("screenshots/vuelosArribos.png")
+    dirScreenPartidas = getPath("screenshots/vuelosPartidas.png")
 
-    dirFotoArribos = os.path.join(BASE_DIR, "..", "screenshots", "vuelosArribos.png")
 
-    if not paginaActiva:
+    if not paginaActiva(url):
         print("La pagina no se encuentra activa.")
         sys.exit(1)
 
@@ -50,7 +59,7 @@ def sacaScreenshots(url):
         }
 
         # Screenshot de SOLO esa región exacta del iframe
-        tab.screenshot(path=dirFotoPartidas, clip=clip)
+        tab.screenshot(path=dirScreenPartidas, clip=clip)
         #print("Screenshot guardado:", dirFotoPartidas)
         
         #Hace lo mismo pero con el iframe de llegadas ahora
@@ -72,17 +81,12 @@ def sacaScreenshots(url):
         }
 
         # Screenshot de SOLO esa región exacta del iframe
-        tab.screenshot(path=dirFotoArribos, clip=clip)
+        tab.screenshot(path=dirScreenArribos, clip=clip)
         #print("Screenshot guardado:", dirFotoArribos)
 
         navegador.close()
 
+        return dirScreenArribos, dirScreenPartidas # Devuelvo el Path de los dos screenshots para vuelos_main.py
+
 if __name__ == "__main__":
-
-    if len(sys.argv) < 2:
-        print("Uso: python Utilities/screenshot.py *url*")
-        sys.exit(1)
-
-    url = sys.argv[1]
-
-    sacaScreenshots(url) #Genera los screenshots
+    pass
