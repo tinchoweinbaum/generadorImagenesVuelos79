@@ -1,16 +1,37 @@
 # generadorImagenesVuelos79
-Toma un screenshot de la página aeropuertosargentina.com de las partidas y salidas y las guarda en un directorio determinado, para después generar una nueva imagen, utilizando una placa donde poner el screenshot.
 
-Se pueden modificar parámetros del programa como la url de la página y el directorio donde guardar la imagen generada en un archivo "datosvuelos.txt". Este archivo se organiza de la siguiente manera:
+Toma un screenshot de la lista de vuelos (arribos y partidas) y la pega sobre placas listas para salir al aire.
 
-1ra Línea: Directorio donde guardar el archivo, ej = "D:\Placas\MDQ" (sin comillas)
-2da Línea: Url de la página de arribos de aeropuertosargentina.com, NO la landing page ni home de aeropuertosargentina.com, sí o sí la página de arribos.
+La configuracion vive en `datosvuelos.txt`, al lado del `.exe` (o en la carpeta del proyecto si corres el script). Formato `clave=valor`:
 
-Si no se especifica alguno de los dos datos, se toman por defecto los siguientes:
+```
+dir=C:\Placas\aire\HD
+url=https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ
+clase=.flex.flex-col.space-5.mb-6.xl\:mb-8.w-full
+clase_arribos=.group.inline-flex.items-center.border-b-2.py-2.xl\:py-2.px-3.lg\:px-4.font-open.text-sm.font-semibold.leading-4.space-3.cursor-pointer.border-transparent.text-gray-500
+clase_cerrar=.fill-none.stroke-white
+```
 
-D:\Placas\MDQ
+- `dir`: carpeta donde se guardan `arribos.bmp` y `partidas.bmp`
+- `url`: pagina de **partidas** (no el home). El programa abre esa URL y despues cambia al tab de arribos
+- `clase`: selector CSS de la lista de vuelos a fotografiar
+- `clase_arribos`: selector CSS del tab de arribos
+- `clase_cerrar`: selector del boton para cerrar popups (opcional)
+
+Tambien se acepta el formato viejo por lineas, sin claves:
+
+1. directorio de salida
+2. url
+3. clase de la lista (opcional)
+4. clase del tab arribos (opcional)
+5. clase del boton cerrar (opcional)
+
+Si falta el archivo o alguna clave, se usan estos valores por defecto:
+
+```
+C:\Placas\aire\HD
 https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ
+.flex.flex-col.space-5.mb-6.xl\:mb-8.w-full
+```
 
-Estos valores también se asumen si no existe datosvuelos.txt
-
-El programa está hardcodeado para la página de aeropuertosargentina.com, en el link que está más arriba. Busca la clase ".flex.flex-col.space-5.mb-6.xl\:mb-8.w-full" y le saca un screenshot sólo a ella. Para cambiar esto hay que cambiar el valor de la variable claseHtml en screenshot.py
+Si no hay vuelos (lista ausente, vacia, sin horarios, o la pagina muestra "No hay resultados"), no se publica el screenshot roto: se usa la placa **No hay vuelos** (`placas/placaArribosSinVuelos.png` y `placas/placaPartidasSinVuelos.png`). Si la pagina no responde, o hay vuelos pero no se encuentra la clase configurada, se deja la placa anterior para no mandar basura al aire.

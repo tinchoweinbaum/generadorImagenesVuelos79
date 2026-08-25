@@ -1,1 +1,14 @@
-C:\Placas\aire\HD
+# Carpeta donde se publican las placas (arribos.bmp y partidas.bmp)
+dir=C:\Placas\aire\HD
+
+# Pagina de PARTIDAS. El programa abre esta URL y despues cambia al tab de arribos.
+url=https://www.aeropuertosargentina.com/es/vuelos?movtp=partidas&idarpt=Mar%20del%20Plata%2C%20MDQ
+
+# Selector CSS de la lista de vuelos a fotografiar
+clase=.flex.flex-col.space-5.mb-6.xl\:mb-8.w-full
+
+# Selector CSS del tab de Arribos
+clase_arribos=.group.inline-flex.items-center.border-b-2.py-2.xl\:py-2.px-3.lg\:px-4.font-open.text-sm.font-semibold.leading-4.space-3.cursor-pointer.border-transparent.text-gray-500
+
+# Selector del boton para cerrar popups (dejar vacio para desactivar)
+clase_cerrar=.fill-none.stroke-white
